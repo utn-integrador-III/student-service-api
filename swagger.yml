@@ -180,27 +180,19 @@ paths:
         "200":
           description: successful operation
           content:
-            application/json;charset=utf-8:
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Report'
-              examples:
-                application/json:
-                  value:
-                  - ReportId: "10"
-                    ReportedBy: "Edgard"
-                    ZoneId: "29"
-                    location: "located at..."
-                    description: "Telefono celular"
-                    photo: array
+                $ref: '#/components/schemas/Report'
+            application/xml:
+              schema:
+               $ref: '#/components/schemas/Report'
         "400":
           description: Invalid ID supplied
           content: {}
     post:
       summary: Create a Report
       description: Creates a new Report
-      operationId: createreport
+      operationId: createReport
       tags:
         - reports
       requestBody:
@@ -209,15 +201,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Report'
-            examples:
-              application/json:
-                value:
-                  ReportId: "10"
-                  ReportedBy: "Edgard"
-                  ZoneId: "29"
-                  location: "located at..."
-                  description: "Telefono celular"
-                  photo: array
+          application/xml:
+            schema:
+               $ref: '#/components/schemas/Report'
+          application/x-www-form-urlencoded:
+            schema:
+               $ref: '#/components/schemas/Report'
         required: true
       responses:
         "200":
@@ -226,15 +215,9 @@ paths:
             application/json;charset=utf-8:
               schema:
                 $ref: '#/components/schemas/Report'
-              examples:
-                application/json:
-                  value:
-                    ReportId: "10"
-                    ReportedBy: "Edgard"
-                    ZoneId: "29"
-                    location: "located at..."
-                    description: "Telefono celular"
-                    photo: array
+            application/xml:
+              schema:
+                  $ref: '#/components/schemas/Report'                
   /report/{ReportId}:
     get:
       summary: Find report by ID
@@ -345,28 +328,35 @@ components:
       type: object
       properties:
         ZoneId:
-          type: string
+          type: integer
+          format: int64
+          example: 01
         name:
           type: string
+          example: Labs
         location:
           type: string
+          example: Close to the cafeteria
     Report:
       required:
       - ReportId
       type: object
       properties:
         ReportId:
-          type: string
+          type: integer
+          format: int64
+          example: 04
         ReportedBy:
           type: string
-        ZoneId:
-          type: string
-        location:
-          type: string
-        description:
-          type: string
-        photo: 
+          example: Eliot Hasbula
+        Zone:
           type: array
           items: 
-              $ref: '#/components/schemas/Zone' 
+            $ref: '#/components/schemas/Zone' 
+        description:
+          type: string
+          example: A cellphone with a HelloKitty Case
+        photo: 
+          type: string
+          example: https://urlphoto.com
         
