@@ -21,5 +21,5 @@ class HealthController(Resource):
         except Exception as ex:
             print(ex)
             logging.exception(ex)
-            return ServerResponse(message='Connection to DB no responding',
+            return ServerResponse(message='Connection to DB is not possible.',
                                       message_code=HEALTH_NOT_FOUND, status=StatusCode.NOT_FOUND)

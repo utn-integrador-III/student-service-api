@@ -20,4 +20,4 @@ class HealthModel():
             return conex
         except errors.ServerSelectionTimeoutError as err:
             print(f"Error connecting to MongoDB: {err}")
-            return None
+            raise Exception(err)
