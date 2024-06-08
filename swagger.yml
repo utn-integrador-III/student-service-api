@@ -1,3 +1,5 @@
+#This is the header of the file, whose main goal is to display important information
+#about the .yml file.
 swagger: "2.0"
 info:
   description: "Booking API's Documentation"
@@ -8,13 +10,20 @@ info:
     email: "ebarahona@utn.ac.cr"
 host: "localhost:5001"
 basePath: "/booking_api"
+#The tags are the identifiers for the paths that are created, this will assign a path with a unique tag,
+#meaning that, an specific end-point belongs to a tag or identifier
 tags:
   - name: "Zone"
     description: "All Zone's Endpoints"
   - name: "Reports"
+  - name: "Auth"
+    description: "Auth paths"
+#the schemes will define the protocol that are been used by the end-points inside the API
 schemes:
   - "https"
   - "http"
+#The definitions will display the information that the end-points will return, all along with the
+#corresponding messages of the errors.
 definitions:
   Response:
     type: object
@@ -89,6 +98,31 @@ definitions:
       description:
         type: string
         example: "Laboratories Zone"
+  AuthGet:
+    type: object
+    properties:
+      email: 
+        type: string
+        example: "semataoe@est.utn.ac.cr"
+      password: 
+        type: string
+        example: "47IR39Rt38"
+      tocken:
+        type: string
+        example: "394FDJ347SL34"
+  AuthPost: 
+    type: object
+    required:
+      - "email"
+      - "password"
+    properties:
+      email:
+        type: string
+        example: "semataoe@es.utn.ac.cr"
+      password:
+        type: string
+        example: "47IR39Rt38"
+#The paths are the ones with all the information of the CRUD methods of the end-points
 paths:
   /zone:
     get:
@@ -243,6 +277,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+  /Auth: 
+    post:
+      tags:
+        - "Auth"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Post Method to authenticate user with email&password"
+          required: true
+          schema:
+            $ref: "#/definitions/AuthPost"
+      summary: "Generate the authentication post method"
+      description: "Create Auth"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "Authentication Succesfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/AuthGet"
+                  message:
+                    example: "Authentication succeed"
+                  message_code:
+                    example: "AUTH_SUCCEED"
+        "409":
+          description: "Credentials did not match"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Auth not Succeed"
+                  message_code:
+                    example: "AUTHENTICATION NOT CORRECT"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse" 
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
