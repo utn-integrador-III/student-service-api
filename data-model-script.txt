@@ -1,2 +1,66 @@
 ##aqui se debe escribir el script para la creacion de collecciones de mongodb
 
+
+
+##for data insertion, you only need to follow the format within the second curly brace
+
+
+db.createCollection("Zone")
+db.Zone.insertOne({ 
+    {
+        "id": 1,
+        "name": "Modulo 1",
+        "location": "Aula 202"
+    }
+})
+
+db.createCollection("User")
+db.User.insertOne({
+    {
+        "UserID": 1,
+        "name": "John Allen Vailarin",
+        "password": "contrasena",
+        "email": "javallan@est.utn.ac.cr",
+        "verification_code": 1234,
+        "end-date": {
+            "$date": "2024-06-08T00:00:00.000Z"
+        },
+        "status": true,
+        "code_id": 1
+    }
+})
+
+db.createCollection("Roles")
+db.Roles.insertOne({
+    {
+        "RoleID": 1,
+        "name": "Admin",
+        "description": "all permissions",
+        "permissions": ["read", "write", "delete"],
+        "creation_date": {
+            "$date": "2024-06-08T00:00:00.000Z"
+        },
+        "mod_date": {
+            "$date": "2024-06-08T00:00:00.000Z"
+        },
+        "status": true
+    }
+})
+
+db.Object_lost.insertOne({
+    {
+        "id": 1,
+        "UserID": 1,
+        "ZoneID": 1,
+        "name": "apple",
+        "description": "bad smell",
+        "status": false,
+        "creation_date": {
+            "$date": "2024-06-08T00:00:00.000Z"
+        },
+        "reclaimed_date": null,
+        "reclaimer": "",
+        "keeper_in_charge": "",
+        "attachment_route": "/lostObjects"
+    }
+})
