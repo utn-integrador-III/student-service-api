@@ -2,9 +2,9 @@
 #about the .yml file.
 swagger: "2.0"
 info:
-  description: "Booking API's Documentation"
+  description: "Stuedent Service API's Documentation"
   version: "1.0.0"
-  title: "Swagger Booking API"
+  title: "Swagger Student Service API"
   termsOfService: "Terms"
   contact:
     email: "ebarahona@utn.ac.cr"
@@ -122,6 +122,47 @@ definitions:
       password:
         type: string
         example: "47IR39Rt38"
+  ReportGet:
+    type: object
+    properties:
+      _id: 
+        type: string
+        example: "45HJ23IK"
+      zone: 
+        type: array
+        items:
+          $ref: "#/definitions/ZoneGet"
+      description:
+        type: string
+        example: "Iphone 12 proMax with yellow case"
+      photo:
+        type: string
+        example: "http://localhost:5001/photo.png"
+      status: 
+        type: string
+        example: "ONF"
+  ReportPost: 
+    type: object
+    required:
+      - "_id"
+      - "zone"
+    properties:
+      _id: 
+        type: string
+        example: "45HJ23IK"
+      zone: 
+        type: array
+        items:
+          $ref: "#/definitions/ZoneGet"
+      description:
+        type: string
+        example: "Iphone 12 proMax with yellow case"
+      photo:
+        type: string
+        example: "http://localhost:5001/photo.png"
+      status: 
+        type: string
+        example: "ONF"
 #The paths are the ones with all the information of the CRUD methods of the end-points
 paths:
   /zone:
@@ -321,6 +362,169 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse" 
+  /report:
+    get:
+      tags:
+        - "Reports"
+      summary: "Get list of all Reports"
+      description: "Get list of all Reports"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "A list of reports"
+          schema:
+            allOf:
+             - $ref: "#/definitions/Response"
+             - properties:
+                 data:
+                   items:
+                     $ref: '#/definitions/ReportGet'
+                 message:
+                    example: "Successfully requested"
+                 message_code:
+                    example:  "OK_MSG"
+
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    post:
+      tags:
+        - "Reports"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Report object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/ReportPost"
+      summary: "Create a Report"
+      description: "Create a Report"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "Report succesfully created"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ReportGet"
+                  message:
+                    example: "Report successfully created"
+                  message_code:
+                    example: "REPORT_SUCCESSFULLY_CREATED"
+        "409":
+          description: "Report already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Report aready exist"
+                  message_code:
+                    example: "REPORT_ALREADY_EXIST"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+  /report/{id}:
+    get:
+      tags:
+        - "Reports"
+      summary: "Find report by ID"
+      description: "Returns a single Report"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID of report to return"
+          required: true
+          type: "string"
+          format: "string"
+      responses:
+        "200":
+          description: "Get single report successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ReportGet"
+        "404":
+          description: "Zone not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Report not found"
+                  message_code:
+                    example: "REPORT_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    delete:
+      tags:
+        - "Reports"
+      summary: "Delete report by ID"
+      description: "Returns a deleted report"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID of report to delete"
+          required: true
+          type: "string"
+          format: "string"
+      responses:
+        "200":
+          description: "Report successfully deleted"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ReportGet"
+                  message:
+                    example: "Report successfully deleted"
+                  message_code:
+                    example: "REPORT_SUCCESSFULLY_DELETED"
+        "404":
+          description: "Country not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Report not found"
+                  message_code:
+                    example: "REPORT_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
