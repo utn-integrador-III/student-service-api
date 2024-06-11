@@ -12,15 +12,26 @@ class ZoneController(Resource):
     """
     Get all zones
     """
-    def get(self):        
+
+    def get(self):
         try:
             zones = ZoneModel.get_all()
 
-            data = [c.to_dict() for c in zones]
-            return ServerResponse(data, status=StatusCode.OK)
+            if isinstance(zones, dict) and "error" in zones:
+                return ServerResponse(data={}, message=zones["error"], status=StatusCode.INTERNAL_SERVER_ERROR)
+
+            if not zones:  # If there are no zones
+                return ServerResponse(data={}, message="No hay zonas", message_code="NO_DATA", status=StatusCode.OK)
+
+            # Convert ObjectId to string
+            for zone in zones:
+                zone['_id'] = str(zone['_id'])
+
+            return ServerResponse(data=zones, status=StatusCode.OK)
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
 
     """
     Create a new zone 
