@@ -16,11 +16,15 @@ class ZoneController(Resource):
         try:
             zones = ZoneModel.get_all()
 
+            if not zones:  # If there are no zones
+                return ServerResponse(data={}, message="No zones", message_code="NO_DATA", status=StatusCode.OK)
+
             data = [c.to_dict() for c in zones]
             return ServerResponse(data, status=StatusCode.OK)
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
 
     """
     Create a new zone 
