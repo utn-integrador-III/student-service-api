@@ -12,6 +12,8 @@ tags:
   - name: "Zone"
     description: "All Zone's Endpoints"
   - name: "Reports"
+  - name: "Users"
+    description: "All users's Endpoints"
 schemes:
   - "https"
   - "http"
@@ -89,6 +91,32 @@ definitions:
       description:
         type: string
         example: "Laboratories Zone"
+  UsersGet:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "3823IE3"
+      name:
+        type: string
+        example: "Laboratories"
+      description:
+        type: string
+        example: Laboratories Zone
+  UsersPost:
+    type: object
+    required:
+      - "_id"
+    properties:
+      _id:
+        type: string
+        example: "3823IE3"
+      name:
+        type: string
+        example: "Laboratories"
+      description:
+        type: string
+        example: "Laboratories Zone"
 paths:
   /zone:
     get:
@@ -102,7 +130,7 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "A list of countries"
+          description: "A list of the zones"
           schema:
             $ref: "#/definitions/Response"
         "500":
@@ -115,7 +143,7 @@ paths:
       parameters:
         - in: "body"
           name: "body"
-          description: "Zone object that needs to be added"
+          description: "Zone object needs to be added"
           required: true
           schema:
             $ref: "#/definitions/ZonePost"
@@ -135,9 +163,9 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Country successfully created"
+                    example: "Zone successfully created"
                   message_code:
-                    example: "COUNTRY_SUCCESSFULLY_CREATED"
+                    example: "ZONE_SUCCESSFULLY_CREATED"
         "409":
           description: "Zone already exists"
           schema:
@@ -152,7 +180,7 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-  /zone/{zoneId}:
+  /zone/{zone_id}:
     get:
       tags:
         - "Zone"
@@ -163,7 +191,7 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - name: "zoneId"
+        - name: "zone_id"
           in: "path"
           description: "ID of zone to return"
           required: true
@@ -206,7 +234,7 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - name: "zoneId"
+        - name: "zone_id"
           in: "path"
           description: "ID of zone to delete"
           required: true
@@ -243,6 +271,115 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+  /users:
+    get: 
+      tags:
+        - "Users"
+      summary: "Get list of all the users"
+      description: "Get list of all users"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "A list of the users"
+          schema:
+            $ref: "#/definitions/Response"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    post:
+      tags:
+        - "Users"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Users Objects need to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/UsersPost"
+      summary: "Create an user"
+      description: "Create an user"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "User was succesfully created"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/UsersGet"
+                  message:
+                    example: "User was successfully created"
+                  message_code:
+                    example: "USER_SUCCESSFULLY_CREATED"
+        "409":
+          description: "User already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User aready exists"
+                  message_code:
+                    example: "USER_ALREADY_EXISTS"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+  /users/{user_id}:
+    get:
+      tags:
+        - "Users"
+      summary: "Find user by ID"
+      description: "Returns a single user"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "user_id"
+          in: "path"
+          description: "ID of user to return"
+          required: true
+          type: "string"
+          format: "string"
+      responses:
+        "200":
+          description: "Get a single user successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+        "404":
+          description: "User not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User not found"
+                  message_code:
+                    example: "USER_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+
+            
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
+  
