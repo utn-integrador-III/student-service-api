@@ -1,46 +1,57 @@
 from flask_restful import Resource
 
 from utils.server_response import *
-from models.site.model import SiteModel
-from controllers.site.parser import query_parser_save
+from models.zone.model import ZoneModel
+from controllers.zone.parser import query_parser_save
 import logging
 
 
-class SiteController(Resource):
-    route = '/booking_api/site'
+class ZoneController(Resource):
+    route = '/zone'
 
     """
-    Get all sites
+    Get all zones
     """
-    def get(self):        
+
+    def get(self):
         try:
-            sites = SiteModel.get_all()
+            zones = ZoneModel.get_all()
 
-            data = [c.to_dict() for c in sites]
-            return ServerResponse(data, status=StatusCode.OK)
+            if isinstance(zones, dict) and "error" in zones:
+                return ServerResponse(data={}, message=zones["error"], status=StatusCode.INTERNAL_SERVER_ERROR)
+
+            if not zones:  # If there are no zones
+                return ServerResponse(data={}, message="No hay zonas", message_code="NO_DATA", status=StatusCode.OK)
+
+            # Convert ObjectId to string
+            for zone in zones:
+                zone['_id'] = str(zone['_id'])
+
+            return ServerResponse(data=zones, status=StatusCode.OK)
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
+
     """
-    Create a new site 
+    Create a new zone 
     """
-    def post(self):
-        data = query_parser_save().parse_args()
-        try:
-            # Validate unique name
-            site_exists = SiteModel.get_by_name(data["name"], data["country_id"])
-            if site_exists:
-                return ServerResponse(message='Site aready exist', 
-                                      message_code=SITE_ALREADY_EXIST, status=StatusCode.CONFLICT)
-            site = SiteModel(**data)
-            site.insert()
-            site = SiteModel.get_by_id(site._id)
-            return ServerResponse(site.to_dict(), message="Site successfully created", 
-                                  message_code=SITE_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+    # def post(self):
+    #     data = query_parser_save().parse_args()
+    #     try:
+    #         # Validate unique name
+    #         site_exists = SiteModel.get_by_name(data["name"], data["country_id"])
+    #         if site_exists:
+    #             return ServerResponse(message='Site aready exist', 
+    #                                   message_code=SITE_ALREADY_EXIST, status=StatusCode.CONFLICT)
+    #         site = SiteModel(**data)
+    #         site.insert()
+    #         site = SiteModel.get_by_id(site._id)
+    #         return ServerResponse(site.to_dict(), message="Site successfully created", 
+    #                               message_code=SITE_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
+    #     except Exception as ex:
+    #         logging.exception(ex)
+    #         return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
 
   
