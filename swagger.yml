@@ -13,17 +13,16 @@ basePath: "/booking_api"
 #The tags are the identifiers for the paths that are created, this will assign a path with a unique tag,
 #meaning that, an specific end-point belongs to a tag or identifier
 tags:
-  - name: "Zone"
+  - name: "Zones"
     description: "All Zone's Endpoints"
-  - name: "Reports"
-<<<<<<< HEAD
-  - name: "Users"
-    description: "All users's Endpoints"
-=======
+  - name: "LostObjects"
   - name: "Auth"
     description: "Auth paths"
+  - name: "Users"
+    description: "All users's Endpoints"
+  - name: "Roles"
+    description: "All Roles endpoints"
 #the schemes will define the protocol that are been used by the end-points inside the API
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
 schemes:
   - "https"
   - "http"
@@ -81,8 +80,8 @@ definitions:
     type: object
     properties:
       _id:
-        type: string
-        example: "3823IE3"
+        type: integer
+        example: 34
       name:
         type: string
         example: "Laboratories"
@@ -95,42 +94,14 @@ definitions:
       - "_id"
     properties:
       _id:
-        type: string
-        example: "3823IE3"
+        type: integer
+        example: 24
       name:
         type: string
         example: "Laboratories"
       description:
         type: string
         example: "Laboratories Zone"
-<<<<<<< HEAD
-  UsersGet:
-    type: object
-    properties:
-      _id:
-        type: string
-        example: "3823IE3"
-      name:
-        type: string
-        example: "Laboratories"
-      description:
-        type: string
-        example: Laboratories Zone
-  UsersPost:
-    type: object
-    required:
-      - "_id"
-    properties:
-      _id:
-        type: string
-        example: "3823IE3"
-      name:
-        type: string
-        example: "Laboratories"
-      description:
-        type: string
-        example: "Laboratories Zone"
-=======
   AuthGet:
     type: object
     properties:
@@ -155,54 +126,186 @@ definitions:
       password:
         type: string
         example: "47IR39Rt38"
-  ReportGet:
+  UserGet:
     type: object
     properties:
-      _id: 
+      UserID:
+        type: integer
+        example: 1
+      name:
         type: string
-        example: "45HJ23IK"
-      zone: 
-        type: array
-        items:
-          $ref: "#/definitions/ZoneGet"
-      description:
+        example: "John Allen Valerin"
+      password:
         type: string
-        example: "Iphone 12 proMax with yellow case"
-      photo:
+        example: "484UTN"
+      email: 
         type: string
-        example: "http://localhost:5001/photo.png"
-      status: 
+        example: "jhonallen@est.utn.ac.cr"
+      status:
         type: string
-        example: "ONF"
-  ReportPost: 
+        example: Active
+  UserPost:
     type: object
     required:
-      - "_id"
-      - "zone"
+      - "UserID"
     properties:
-      _id: 
+      UserID:
+        type: integer
+        example: 1
+      name:
         type: string
-        example: "45HJ23IK"
-      zone: 
-        type: array
-        items:
-          $ref: "#/definitions/ZoneGet"
+        example: "John Allen Valerin"
+      password:
+        type: string
+        example: "484UTN"
+      email: 
+        type: string
+        example: "jhonallen@est.utn.ac.cr"
+      status:
+        type: string
+        example: Active
+  LostObjectGet:
+    type: object
+    properties:
+      id: 
+        type: integer
+        example: 4
+      UserID:
+        type: integer
+        example: 6
+      ZoneID: 
+        type: integer
+        example: 1
+      name: 
+        type: string
+        example: "Phone"
       description:
         type: string
         example: "Iphone 12 proMax with yellow case"
-      photo:
-        type: string
-        example: "http://localhost:5001/photo.png"
       status: 
         type: string
         example: "ONF"
+      creation_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      claimed_date:
+        type: object
+        example:
+          $date: "null"
+      claimer:
+        type: string
+        example: "None"
+      keeper_In_Charge:
+        type: string
+        example: "Lab Person in Charge"
+      attachment_path: 
+        type: string
+        example: "/lostObjects"     
+  LostObjectPost: 
+    type: object
+    required:
+      - "id"
+    properties:
+      id: 
+        type: integer
+        example: 4
+      UserID:
+        type: integer
+        example: 6
+      ZoneID: 
+        type: integer
+        example: 1
+      name: 
+        type: string
+        example: "Phone"
+      description:
+        type: string
+        example: "Iphone 12 proMax with yellow case"
+      status: 
+        type: string
+        example: "ONF"
+      creation_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      reclaimed_date:
+        type: object
+        example:
+          $date: "null"
+      reclaimer:
+        type: string
+        example: "None"
+      keeper_In_Charge:
+        type: string
+        example: "Lab Person in Charge"
+      attachment_route: 
+        type: string
+        example: "/lostObjects"
+  RoleGet:
+    type: object
+    properties:
+      RoleId: 
+        type: integer
+        example: 1
+      name:
+        type: string
+        example: "Admin"
+      permissions:
+        type: array
+        items:
+          type: string
+        example:
+          - "read"
+          - "write"
+          - "delete"
+      creation_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      mod_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      is_active:
+        type: boolean
+        example: True    
+  RolePost: 
+    type: object
+    required:
+      - "RoleId"
+    properties:
+      RoleId: 
+        type: integer
+        example: 1
+      name:
+        type: string
+        example: "Admin"
+      permissions:
+        type: array
+        items:
+          type: string
+        example:
+          - "read"
+          - "write"
+          - "delete"
+      creation_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      mod_date:
+        type: object
+        example:
+          $date: "2024-06-08T00:00:00.000Z"
+      is_active:
+        type: boolean
+        example: True 
 #The paths are the ones with all the information of the CRUD methods of the end-points
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
 paths:
   /zone:
     get:
       tags:
-        - "Zone"
+        - "Zones"
       summary: "Get list of all Zones"
       description: "Get list of all Zones"
       consumes:
@@ -211,7 +314,7 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "A list of the zones"
+          description: "A list of countries"
           schema:
             $ref: "#/definitions/Response"
         "500":
@@ -220,11 +323,11 @@ paths:
             $ref: "#/definitions/InternalErrorResponse"
     post:
       tags:
-        - "Zone"
+        - "Zones"
       parameters:
         - in: "body"
           name: "body"
-          description: "Zone object needs to be added"
+          description: "Zone object that needs to be added"
           required: true
           schema:
             $ref: "#/definitions/ZonePost"
@@ -244,9 +347,9 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Zone successfully created"
+                    example: "Country successfully created"
                   message_code:
-                    example: "ZONE_SUCCESSFULLY_CREATED"
+                    example: "COUNTRY_SUCCESSFULLY_CREATED"
         "409":
           description: "Zone already exists"
           schema:
@@ -261,10 +364,10 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-  /zone/{zone_id}:
+  /zone/{zoneId}:
     get:
       tags:
-        - "Zone"
+        - "Zones"
       summary: "Find zone by ID"
       description: "Returns a single Zone"
       consumes:
@@ -272,12 +375,12 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - name: "zone_id"
+        - name: "zoneId"
           in: "path"
           description: "ID of zone to return"
           required: true
-          type: "string"
-          format: "string"
+          type: "integer"
+          format: "integer"
       responses:
         "200":
           description: "Get single zone successfully"
@@ -307,7 +410,7 @@ paths:
             $ref: "#/definitions/InternalErrorResponse"
     delete:
       tags:
-        - "Zone"
+        - "Zones"
       summary: "Delete zone by ID"
       description: "Returns a deleted zone"
       consumes:
@@ -315,12 +418,12 @@ paths:
       produces:
         - "application/json"
       parameters:
-        - name: "zone_id"
+        - name: "zoneId"
           in: "path"
           description: "ID of zone to delete"
           required: true
-          type: "string"
-          format: "string"
+          type: "integer"
+          format: "integer"
       responses:
         "200":
           description: "Zone successfully deleted"
@@ -352,347 +455,41 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-<<<<<<< HEAD
-  /users:
-    get: 
-      tags:
-        - "Users"
-      summary: "Get list of all the users"
-      description: "Get list of all users"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        "200":
-          description: "A list of the users"
-          schema:
-            $ref: "#/definitions/Response"
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse"
-    post:
-      tags:
-        - "Users"
-      parameters:
-        - in: "body"
-          name: "body"
-          description: "Users Objects need to be added"
-          required: true
-          schema:
-            $ref: "#/definitions/UsersPost"
-      summary: "Create an user"
-      description: "Create an user"
-=======
-  /Auth: 
-    post:
-      tags:
-        - "Auth"
-      parameters:
-        - in: "body"
-          name: "body"
-          description: "Post Method to authenticate user with email&password"
-          required: true
-          schema:
-            $ref: "#/definitions/AuthPost"
-      summary: "Generate the authentication post method"
-      description: "Create Auth"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        "201":
-<<<<<<< HEAD
-          description: "User was succesfully created"
-=======
-          description: "Authentication Succesfully"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-          schema:
-            allOf:
-              - $ref: "#/definitions/Response"
-              - properties:
-                  data:
-<<<<<<< HEAD
-                    $ref: "#/definitions/UsersGet"
-                  message:
-                    example: "User was successfully created"
-                  message_code:
-                    example: "USER_SUCCESSFULLY_CREATED"
-        "409":
-          description: "User already exists"
-=======
-                    $ref: "#/definitions/AuthGet"
-                  message:
-                    example: "Authentication succeed"
-                  message_code:
-                    example: "AUTH_SUCCEED"
-        "409":
-          description: "Credentials did not match"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-<<<<<<< HEAD
-                    example: "User aready exists"
-                  message_code:
-                    example: "USER_ALREADY_EXISTS"
-=======
-                    example: "Auth not Succeed"
-                  message_code:
-                    example: "AUTHENTICATION NOT CORRECT"
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse" 
-  /report:
-    get:
-      tags:
-        - "Reports"
-      summary: "Get list of all Reports"
-      description: "Get list of all Reports"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        "200":
-          description: "A list of reports"
-          schema:
-            allOf:
-             - $ref: "#/definitions/Response"
-             - properties:
-                 data:
-                   items:
-                     $ref: '#/definitions/ReportGet'
-                 message:
-                    example: "Successfully requested"
-                 message_code:
-                    example:  "OK_MSG"
-
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse"
-<<<<<<< HEAD
-  /users/{user_id}:
-    get:
-      tags:
-        - "Users"
-      summary: "Find user by ID"
-      description: "Returns a single user"
-=======
-    post:
-      tags:
-        - "Reports"
-      parameters:
-        - in: "body"
-          name: "body"
-          description: "Report object that needs to be added"
-          required: true
-          schema:
-            $ref: "#/definitions/ReportPost"
-      summary: "Create a Report"
-      description: "Create a Report"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      responses:
-        "201":
-          description: "Report succesfully created"
-          schema:
-            allOf:
-              - $ref: "#/definitions/Response"
-              - properties:
-                  data:
-                    $ref: "#/definitions/ReportGet"
-                  message:
-                    example: "Report successfully created"
-                  message_code:
-                    example: "REPORT_SUCCESSFULLY_CREATED"
-        "409":
-          description: "Report already exists"
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-                    example: "Report aready exist"
-                  message_code:
-                    example: "REPORT_ALREADY_EXIST"
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse"
-  /report/{id}:
-    get:
-      tags:
-        - "Reports"
-      summary: "Find report by ID"
-      description: "Returns a single Report"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-<<<<<<< HEAD
-        - name: "user_id"
-          in: "path"
-          description: "ID of user to return"
-=======
-        - name: "id"
-          in: "path"
-          description: "ID of report to return"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-          required: true
-          type: "string"
-          format: "string"
-      responses:
-        "200":
-<<<<<<< HEAD
-          description: "Get a single user successfully"
-=======
-          description: "Get single report successfully"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-          schema:
-            allOf:
-              - $ref: "#/definitions/Response"
-              - properties:
-                  data:
-<<<<<<< HEAD
-                    $ref: "#/definitions/ZoneGet"
-        "404":
-          description: "User not found"
-=======
-                    $ref: "#/definitions/ReportGet"
-        "404":
-          description: "Zone not found"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-<<<<<<< HEAD
-                    example: "User not found"
-                  message_code:
-                    example: "USER_ITEM_NOT_FOUND"
-=======
-                    example: "Report not found"
-                  message_code:
-                    example: "REPORT_ITEM_NOT_FOUND"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
-        "422":
-          description: "Invalid Object Id"
-          schema:
-            $ref: "#/definitions/InvalidIdErrorResponse"
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse"
-<<<<<<< HEAD
-
-            
-=======
-    delete:
-      tags:
-        - "Reports"
-      summary: "Delete report by ID"
-      description: "Returns a deleted report"
-      consumes:
-        - "application/json"
-      produces:
-        - "application/json"
-      parameters:
-        - name: "id"
-          in: "path"
-          description: "ID of report to delete"
-          required: true
-          type: "string"
-          format: "string"
-      responses:
-        "200":
-          description: "Report successfully deleted"
-          schema:
-            allOf:
-              - $ref: "#/definitions/Response"
-              - properties:
-                  data:
-                    $ref: "#/definitions/ReportGet"
-                  message:
-                    example: "Report successfully deleted"
-                  message_code:
-                    example: "REPORT_SUCCESSFULLY_DELETED"
-        "404":
-          description: "Country not found"
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-                    example: "Report not found"
-                  message_code:
-                    example: "REPORT_ITEM_NOT_FOUND"
-        "422":
-          description: "Invalid Object Id"
-          schema:
-            $ref: "#/definitions/InvalidIdErrorResponse"
-        "500":
-          description: "Internal Server Error"
-          schema:
-            $ref: "#/definitions/InternalErrorResponse"
     put:
         tags:
-          - "Reports"
+          - "Zones"
         parameters:
-          - name: "id"
+          - name: "zoneId"
             in: "path"
-            description: "ID of report to update"
+            description: "ID of Zone to update"
             required: true
-            type: "string"
-            format: "string"
+            type: integer
+            format: integer
           - in: "body"
             name: "body"
-            description: "Report object that needs to be updated"
+            description: "Zone object that needs to be updated"
             required: true
             schema:
-              $ref: "#/definitions/ReportPost"
-        summary: "Update an Report"
-        description: "Update an Report"
+              $ref: "#/definitions/ZonePost"
+        summary: "Update a Zone"
+        description: "Update a Zone"
         consumes:
           - "application/json"
         produces:
           - "application/json"
         responses:
           "200":
-            description: "An updated report"
+            description: "An updated zone"
             schema:
               allOf:
                 - $ref: "#/definitions/Response"
                 - properties:
                     data:
-                      $ref: "#/definitions/ReportGet"
+                      $ref: "#/definitions/ZoneGet"
                     message:
-                      example: "Report successfully updated"
+                      example: "Zone successfully updated"
                     message_code:
-                      example: "REPORT_SUCCESSFULLY_UPDATED"
-          "409":
-            description: "Report already exists"
-            schema:
-              allOf:
-                - $ref: "#/definitions/ErrorResponse"
-                - properties:
-                    message:
-                      example: "Report already exist for the selected site"
-                    message_code:
-                      example: "REPORT_ALREADY_EXIST"
+                      example: "ZONE_SUCCESSFULLY_UPDATED"
           "500":
             description: "Internal Server Error"
             schema:
@@ -708,8 +505,689 @@ paths:
                       example: "Invalid Id"
                     message_code:
                       example: "INVALID_ID"
->>>>>>> c285d8e73cc761d769dbf46bb9c0001de4d7da50
+  /Auth: 
+    post:
+      tags:
+        - "Auth"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Post Method to authenticate user with email&password"
+          required: true
+          schema:
+            $ref: "#/definitions/AuthPost"
+      summary: "Generate the authentication post method"
+      description: "Create Auth"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "Authentication Succesfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/AuthGet"
+                  message:
+                    example: "Authentication succeed"
+                  message_code:
+                    example: "AUTH_SUCCEED"
+        "409":
+          description: "Credentials did not match"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Auth not Succeed"
+                  message_code:
+                    example: "AUTHENTICATION NOT CORRECT"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse" 
+  /user:
+    get:
+      tags:
+        - "Users"
+      summary: "Get list of all Users"
+      description: "Get list of all Users"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "A list of Users"
+          schema:
+            allOf:
+             - $ref: "#/definitions/Response"
+             - properties:
+                 data:
+                   items:
+                     $ref: '#/definitions/UserGet'
+                 message:
+                    example: "Successfully requested"
+                 message_code:
+                    example:  "OK_MSG"
+
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    post:
+      tags:
+        - "Users"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "User object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/UserPost"
+      summary: "Create a User"
+      description: "Create a User"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "User succesfully created"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/UserGet"
+                  message:
+                    example: "User successfully created"
+                  message_code:
+                    example: "USER_SUCCESSFULLY_CREATED"
+        "409":
+          description: "User already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User already exist"
+                  message_code:
+                    example: "USER_ALREADY_EXIST"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+  /user/{UserID}:
+    get:
+      tags:
+        - "Users"
+      summary: "Find user by ID"
+      description: "Returns a single User"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "UserID"
+          in: "path"
+          description: "UserId of report to return"
+          required: true
+          type: integer
+          format: integer
+      responses:
+        "200":
+          description: "Get single user successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/UserGet"
+        "404":
+          description: "User not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User not found"
+                  message_code:
+                    example: "USER_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    delete:
+      tags:
+        - "Users"
+      summary: "Delete User by ID"
+      description: "Returns a deleted role"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "UserID"
+          in: "path"
+          description: "ID of user to delete"
+          required: true
+          type: integer
+          format: integer
+      responses:
+        "200":
+          description: "User successfully deleted"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/UserGet"
+                  message:
+                    example: "User successfully deleted"
+                  message_code:
+                    example: "USER_SUCCESSFULLY_DELETED"
+        "404":
+          description: "User not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User not found"
+                  message_code:
+                    example: "USER_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "Users"
+        parameters:
+          - name: "UserID"
+            in: "path"
+            description: "ID of User to update"
+            required: true
+            type: integer
+            format: "integer"
+          - in: "body"
+            name: "body"
+            description: "User object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/UserPost"
+        summary: "Update a User"
+        description: "Update a User"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated user"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/UserGet"
+                    message:
+                      example: "User successfully updated"
+                    message_code:
+                      example: "USER_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
+  /lostObject:
+    get:
+      tags:
+        - "LostObjects"
+      summary: "Get list of all Reports"
+      description: "Get list of all Reports"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "A list of lost objects"
+          schema:
+            allOf:
+             - $ref: "#/definitions/Response"
+             - properties:
+                 data:
+                   items:
+                     $ref: '#/definitions/LostObjectGet'
+                 message:
+                    example: "Successfully requested"
+                 message_code:
+                    example:  "OK_MSG"
+
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    post:
+      tags:
+        - "LostObjects"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "LostObject object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/LostObjectPost"
+      summary: "Generate a Lost Object"
+      description: "Generate a Lost Object"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "Lost Object succesfully created"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/LostObjectGet"
+                  message:
+                    example: "Lost Object successfully created"
+                  message_code:
+                    example: "LOST_OBJECT_SUCCESSFULLY_CREATED"
+        "409":
+          description: "Lost Object already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Lost Object aready exist"
+                  message_code:
+                    example: "LOST_OBJECT_ALREADY_EXIST"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+  /lostObject/{id}:
+    get:
+      tags:
+        - "LostObjects"
+      summary: "Find Lost Object by ID"
+      description: "Returns a single Lost Object"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID of lost Object to return"
+          required: true
+          type: "integer"
+          format: "integer"
+      responses:
+        "200":
+          description: "Get single lost object successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/LostObjectGet"
+        "404":
+          description: "Zone not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Lost Object not found"
+                  message_code:
+                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    delete:
+      tags:
+        - "LostObjects"
+      summary: "Delete lost Object by ID"
+      description: "Returns a deleted lostObject"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "id"
+          in: "path"
+          description: "ID of lost Object to delete"
+          required: true
+          type: "integer"
+          format: "integer"
+      responses:
+        "200":
+          description: "Lost Object successfully deleted"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/LostObjectGet"
+                  message:
+                    example: "Lost Object successfully deleted"
+                  message_code:
+                    example: "LOST_OBJECT_SUCCESSFULLY_DELETED"
+        "404":
+          description: "Lost Object not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Lost Object not found"
+                  message_code:
+                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "LostObjects"
+        parameters:
+          - name: "id"
+            in: "path"
+            description: "ID of lost object to update"
+            required: true
+            type: "integer"
+            format: "integer"
+          - in: "body"
+            name: "body"
+            description: "Lost object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/LostObjectPost"
+        summary: "Update an Lost Object"
+        description: "Update an Lost Object"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated LostObject"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/LostObjectGet"
+                    message:
+                      example: "LostObject successfully updated"
+                    message_code:
+                      example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
+  /role:
+    get:
+      tags:
+        - "Roles"
+      summary: "Get list of all Roles"
+      description: "Get list of all Roles"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "A list of roles"
+          schema:
+            allOf:
+             - $ref: "#/definitions/Response"
+             - properties:
+                 data:
+                   items:
+                     $ref: '#/definitions/RoleGet'
+                 message:
+                    example: "Successfully requested"
+                 message_code:
+                    example:  "OK_MSG"
+
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    post:
+      tags:
+        - "Roles"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Role object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/RolePost"
+      summary: "Create a Role"
+      description: "Create a Role"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "201":
+          description: "Role succesfully created"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/RoleGet"
+                  message:
+                    example: "Role successfully created"
+                  message_code:
+                    example: "ROLE_SUCCESSFULLY_CREATED"
+        "409":
+          description: "Role already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Role aready exist"
+                  message_code:
+                    example: "ROLE_ALREADY_EXIST"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+  /role/{RoleId}:
+    get:
+      tags:
+        - "Roles"
+      summary: "Find role by ID"
+      description: "Returns a single Report"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "RoleId"
+          in: "path"
+          description: "RoleId of report to return"
+          required: true
+          type: "integer"
+          format: "integer"
+      responses:
+        "200":
+          description: "Get single role successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/RoleGet"
+        "404":
+          description: "Role not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Role not found"
+                  message_code:
+                    example: "ROLE_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    delete:
+      tags:
+        - "Roles"
+      summary: "Delete Role by ID"
+      description: "Returns a deleted role"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "RoleId"
+          in: "path"
+          description: "ID of role to delete"
+          required: true
+          type: "integer"
+          format: "integer"
+      responses:
+        "200":
+          description: "Role successfully deleted"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/RoleGet"
+                  message:
+                    example: "Role successfully deleted"
+                  message_code:
+                    example: "ROLE_SUCCESSFULLY_DELETED"
+        "404":
+          description: "Country not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Role not found"
+                  message_code:
+                    example: "ROLE_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "Roles"
+        parameters:
+          - name: "RoleId"
+            in: "path"
+            description: "ID of role to update"
+            required: true
+            type: "integer"
+            format: "integer"
+          - in: "body"
+            name: "body"
+            description: "Role object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/RolePost"
+        summary: "Update an Role"
+        description: "Update an Role"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated role"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/RoleGet"
+                    message:
+                      example: "Role successfully updated"
+                    message_code:
+                      example: "ROLE_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
-  
