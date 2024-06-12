@@ -26,5 +26,4 @@ class ZoneModel:
         try:
             result = __dbmanager__.delete_data(str(id))
         except Exception as ex:
-            # logging.exception(ex)
             raise Exception(ex)

@@ -50,5 +50,4 @@ class Connection:
             else:
                 return False
         except Exception as e:
-            logging.exception(e)
-            raise Exception("Error deleting data")
+            raise Exception(e)
