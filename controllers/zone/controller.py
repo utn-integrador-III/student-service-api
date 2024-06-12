@@ -1,10 +1,10 @@
 from flask_restful import Resource
 
 from utils.server_response import *
+from utils.message_codes import *
 from models.zone.model import ZoneModel
 from controllers.zone.parser import query_parser_save
 import logging
-
 
 class ZoneController(Resource):
     route = '/zone'
@@ -21,7 +21,7 @@ class ZoneController(Resource):
                 return ServerResponse(data={}, message=zones["error"], status=StatusCode.INTERNAL_SERVER_ERROR)
 
             if not zones:  # If there are no zones
-                return ServerResponse(data={}, message="No hay zonas", message_code="NO_DATA", status=StatusCode.OK)
+                return ServerResponse(data={}, message="No zones found", message_codes=NO_DATA, status=StatusCode.OK)
 
             # Convert ObjectId to string
             for zone in zones:
