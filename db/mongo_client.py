@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 from decouple import config
+import logging
+from bson.objectid import ObjectId
 
 
 class Connection:
@@ -10,8 +12,8 @@ class Connection:
         self.connect(collection_name)
 
     def connect(self, collection_name):
-        uri = config('MONGO_URL')
-        db = config('MONGO_DB')
+        uri = config("MONGO_URL")
+        db = config("MONGO_DB")
         self.collection = MongoClient(uri)[db][collection_name]
 
     def get_all_data(self):
@@ -23,10 +25,11 @@ class Connection:
 
     def get_by_id(self, id):
         try:
-            result = self.collection.find({'id':id})
+            result = self.collection.find({"id": id})
         except Exception as e:
             return e
         return result
+
     def create_data(self, data):
         try:
             return self.collection.insert_one(data)
@@ -35,15 +38,17 @@ class Connection:
 
     def update_data(self, id, new_deal_data):
         try:
-            self.collection.update_one(
-                {"id": id},
-                {"$set": new_deal_data}
-            )
+            self.collection.update_one({"id": id}, {"$set": new_deal_data})
         except Exception as e:
             return e
 
     def delete_data(self, id):
         try:
-            return self.collection.delete_one({'id': id})
+            result = self.collection.delete_one({"_id": ObjectId(id)})
+            if result.deleted_count > 0:
+                return True
+            else:
+                return False
         except Exception as e:
-            return e
+            logging.exception(e)
+            raise Exception("Error deleting data")
