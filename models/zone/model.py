@@ -25,10 +25,6 @@ class ZoneModel:
     def delete(cls, id):
         try:
             result = __dbmanager__.delete_data(str(id))
-            if result:
-                return "Zone successfully deleted"
-            else:
-                return "Zone not found"
         except Exception as ex:
-            logging.exception(ex)
-            raise Exception("Error deleting zone")
+            # logging.exception(ex)
+            raise Exception(ex)
