@@ -8,7 +8,6 @@
 db.createCollection("zone")
 db.zone.insertOne({ 
     {
-        "id": 1,
         "name": "Modulo 1",
         "location": "Aula 202"
     }
