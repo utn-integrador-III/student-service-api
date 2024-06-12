@@ -12,7 +12,7 @@ class Connection:
     def connect(self, collection_name):
         uri = config('MONGO_URL')
         db = config('MONGO_DB')
-        self.collection = MongoClient(uri, ssl=False)[db][collection_name]
+        self.collection = MongoClient(uri)[db][collection_name]
 
     def get_all_data(self):
         try:
