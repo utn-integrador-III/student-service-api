@@ -5,8 +5,8 @@
 ##for data insertion, you only need to follow the format within the second curly brace
 
 
-db.createCollection("Zone")
-db.Zone.insertOne({ 
+db.createCollection("zone")
+db.zone.insertOne({ 
     {
         "id": 1,
         "name": "Modulo 1",
@@ -14,10 +14,10 @@ db.Zone.insertOne({
     }
 })
 
-db.createCollection("User")
-db.User.insertOne({
+db.createCollection("user")
+db.user.insertOne({
     {
-        "UserID": 1,
+        "userId": 1,
         "name": "John Allen Vailarin",
         "password": "contrasena",
         "email": "javallan@est.utn.ac.cr",
@@ -25,15 +25,14 @@ db.User.insertOne({
         "end-date": {
             "$date": "2024-06-08T00:00:00.000Z"
         },
-        "status": true,
-        "code_id": 1
+        "status": ["Active","Inactive","Enrolling"]
     }
 })
 
-db.createCollection("Roles")
-db.Roles.insertOne({
+db.createCollection("roles")
+db.roles.insertOne({
     {
-        "RoleID": 1,
+        "roleId": 1,
         "name": "Admin",
         "description": "all permissions",
         "permissions": ["read", "write", "delete"],
@@ -43,24 +42,25 @@ db.Roles.insertOne({
         "mod_date": {
             "$date": "2024-06-08T00:00:00.000Z"
         },
-        "status": true
+        "is_active": true
     }
 })
 
 db.Object_lost.insertOne({
     {
         "id": 1,
-        "UserID": 1,
-        "ZoneID": 1,
         "name": "apple",
         "description": "bad smell",
-        "status": false,
+        "status": ["Pending", "Claimed", "Active", "Inactive"],
         "creation_date": {
             "$date": "2024-06-08T00:00:00.000Z"
         },
-        "reclaimed_date": null,
-        "reclaimer": "",
-        "keeper_in_charge": "",
-        "attachment_route": "/lostObjects"
+        "claim_date": {
+            "$date": "2024-06-08T00:00:00.000Z"
+        },
+        "claimer": "",
+        "safekeeper": "",
+        "attachment_path": "/lostObjects",
+        "userId": 1,
     }
 })

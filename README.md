@@ -21,4 +21,4 @@
 
 5. Run the project under 'Run and debug'
 
-![Database diagram](BDdiagram.jpg)
+![Database diagram](diagramdb.png)
