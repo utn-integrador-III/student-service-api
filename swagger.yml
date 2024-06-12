@@ -35,7 +35,7 @@ definitions:
       data:
         type: array
         items:
-          $ref: "#/definitions/ZoneGet"
+          $ref: "#/definitions"
       message:
         type: string
         example: "Successfully requested"
@@ -80,6 +80,9 @@ definitions:
     type: object
     properties:
       _id:
+        type: string
+        example: "0183IEHU#&#J"
+      ZoneID:
         type: integer
         example: 34
       name:
@@ -88,14 +91,20 @@ definitions:
       description:
         type: string
         example: Laboratories Zone
-  ZonePost:
+  ZoneGetById:
     type: object
-    required:
-      - "_id"
     properties:
       _id:
         type: integer
-        example: 24
+        example: 34
+      name:
+        type: string
+        example: "Laboratories"
+  ZonePost:
+    type: object
+    required:
+      - "name"
+    properties:
       name:
         type: string
         example: "Laboratories"
@@ -129,6 +138,9 @@ definitions:
   UserGet:
     type: object
     properties:
+      _id:
+        type: string
+        example: "YRH347&%HF"
       UserID:
         type: integer
         example: 1
@@ -144,6 +156,15 @@ definitions:
       status:
         type: string
         example: Active
+  UserGetById:
+    type: object
+    properties:
+      UserID:
+        type: integer
+        example: 1
+      name:
+        type: string
+        example: "John Allen Valerin"
   UserPost:
     type: object
     required:
@@ -167,7 +188,10 @@ definitions:
   LostObjectGet:
     type: object
     properties:
-      id: 
+      _id:
+        type: string
+        example: "923UTher&#$83"
+      Object_Id: 
         type: integer
         example: 4
       UserID:
@@ -202,6 +226,21 @@ definitions:
       attachment_path: 
         type: string
         example: "/lostObjects"     
+  LostObjectGetById:
+    type: object
+    properties:
+      id: 
+        type: integer
+        example: 4
+      UserID:
+        type: integer
+        example: 6
+      ZoneID: 
+        type: integer
+        example: 1
+      description:
+        type: string
+        example: "Iphone 12 proMax with yellow case"
   LostObjectPost: 
     type: object
     required:
@@ -245,6 +284,9 @@ definitions:
   RoleGet:
     type: object
     properties:
+      _id:
+        type: string
+        example: "837UEJ374uRy3"
       RoleId: 
         type: integer
         example: 1
@@ -270,10 +312,17 @@ definitions:
       is_active:
         type: boolean
         example: True    
+  RoleGetById:
+    type: object
+    properties:
+      RoleId: 
+        type: integer
+        example: 1
+      name:
+        type: string
+        example: "Admin" 
   RolePost: 
     type: object
-    required:
-      - "RoleId"
     properties:
       RoleId: 
         type: integer
@@ -316,7 +365,7 @@ paths:
         "200":
           description: "A list of countries"
           schema:
-            $ref: "#/definitions/Response"
+            $ref: "#/definitions/ZoneGet"
         "500":
           description: "Internal Server Error"
           schema:
@@ -364,6 +413,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "Zones"
+        parameters:
+          - in: "body"
+            name: "body"
+            description: "Zone object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/ZoneGetById"
+        summary: "Update a Zone"
+        description: "Update a Zone"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated zone"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/ZoneGet"
+                    message:
+                      example: "Zone successfully updated"
+                    message_code:
+                      example: "ZONE_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
   /zone/{zoneId}:
     get:
       tags:
@@ -455,56 +548,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-    put:
-        tags:
-          - "Zones"
-        parameters:
-          - name: "zoneId"
-            in: "path"
-            description: "ID of Zone to update"
-            required: true
-            type: integer
-            format: integer
-          - in: "body"
-            name: "body"
-            description: "Zone object that needs to be updated"
-            required: true
-            schema:
-              $ref: "#/definitions/ZonePost"
-        summary: "Update a Zone"
-        description: "Update a Zone"
-        consumes:
-          - "application/json"
-        produces:
-          - "application/json"
-        responses:
-          "200":
-            description: "An updated zone"
-            schema:
-              allOf:
-                - $ref: "#/definitions/Response"
-                - properties:
-                    data:
-                      $ref: "#/definitions/ZoneGet"
-                    message:
-                      example: "Zone successfully updated"
-                    message_code:
-                      example: "ZONE_SUCCESSFULLY_UPDATED"
-          "500":
-            description: "Internal Server Error"
-            schema:
-              $ref: "#/definitions/InternalErrorResponse"
-
-          "422":
-            description: "Invalid Id"
-            schema:
-              allOf:
-                - $ref: "#/definitions/ErrorResponse"
-                - properties:
-                    message:
-                      example: "Invalid Id"
-                    message_code:
-                      example: "INVALID_ID"
   /Auth: 
     post:
       tags:
@@ -621,6 +664,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "Users"
+        parameters:
+          - in: "body"
+            name: "body"
+            description: "User object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/UserGetById"
+        summary: "Update a User"
+        description: "Update a User"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated user"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/UserGet"
+                    message:
+                      example: "User successfully updated"
+                    message_code:
+                      example: "USER_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
   /user/{UserID}:
     get:
       tags:
@@ -712,56 +799,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-    put:
-        tags:
-          - "Users"
-        parameters:
-          - name: "UserID"
-            in: "path"
-            description: "ID of User to update"
-            required: true
-            type: integer
-            format: "integer"
-          - in: "body"
-            name: "body"
-            description: "User object that needs to be updated"
-            required: true
-            schema:
-              $ref: "#/definitions/UserPost"
-        summary: "Update a User"
-        description: "Update a User"
-        consumes:
-          - "application/json"
-        produces:
-          - "application/json"
-        responses:
-          "200":
-            description: "An updated user"
-            schema:
-              allOf:
-                - $ref: "#/definitions/Response"
-                - properties:
-                    data:
-                      $ref: "#/definitions/UserGet"
-                    message:
-                      example: "User successfully updated"
-                    message_code:
-                      example: "USER_SUCCESSFULLY_UPDATED"
-          "500":
-            description: "Internal Server Error"
-            schema:
-              $ref: "#/definitions/InternalErrorResponse"
-
-          "422":
-            description: "Invalid Id"
-            schema:
-              allOf:
-                - $ref: "#/definitions/ErrorResponse"
-                - properties:
-                    message:
-                      example: "Invalid Id"
-                    message_code:
-                      example: "INVALID_ID"
   /lostObject:
     get:
       tags:
@@ -834,6 +871,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+    put:
+        tags:
+          - "LostObjects"
+        parameters:
+          - in: "body"
+            name: "body"
+            description: "Lost object that needs to be updated"
+            required: true
+            schema:
+              $ref: "#/definitions/LostObjectGetById"
+        summary: "Update an Lost Object"
+        description: "Update an Lost Object"
+        consumes:
+          - "application/json"
+        produces:
+          - "application/json"
+        responses:
+          "200":
+            description: "An updated LostObject"
+            schema:
+              allOf:
+                - $ref: "#/definitions/Response"
+                - properties:
+                    data:
+                      $ref: "#/definitions/LostObjectGet"
+                    message:
+                      example: "LostObject successfully updated"
+                    message_code:
+                      example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
+          "500":
+            description: "Internal Server Error"
+            schema:
+              $ref: "#/definitions/InternalErrorResponse"
+
+          "422":
+            description: "Invalid Id"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Invalid Id"
+                    message_code:
+                      example: "INVALID_ID"
   /lostObject/{id}:
     get:
       tags:
@@ -925,56 +1006,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-    put:
-        tags:
-          - "LostObjects"
-        parameters:
-          - name: "id"
-            in: "path"
-            description: "ID of lost object to update"
-            required: true
-            type: "integer"
-            format: "integer"
-          - in: "body"
-            name: "body"
-            description: "Lost object that needs to be updated"
-            required: true
-            schema:
-              $ref: "#/definitions/LostObjectPost"
-        summary: "Update an Lost Object"
-        description: "Update an Lost Object"
-        consumes:
-          - "application/json"
-        produces:
-          - "application/json"
-        responses:
-          "200":
-            description: "An updated LostObject"
-            schema:
-              allOf:
-                - $ref: "#/definitions/Response"
-                - properties:
-                    data:
-                      $ref: "#/definitions/LostObjectGet"
-                    message:
-                      example: "LostObject successfully updated"
-                    message_code:
-                      example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
-          "500":
-            description: "Internal Server Error"
-            schema:
-              $ref: "#/definitions/InternalErrorResponse"
-
-          "422":
-            description: "Invalid Id"
-            schema:
-              allOf:
-                - $ref: "#/definitions/ErrorResponse"
-                - properties:
-                    message:
-                      example: "Invalid Id"
-                    message_code:
-                      example: "INVALID_ID"
   /role:
     get:
       tags:
@@ -1047,6 +1078,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+    put:
+          tags:
+            - "Roles"
+          parameters:
+            - in: "body"
+              name: "body"
+              description: "Role object that needs to be updated"
+              required: true
+              schema:
+                $ref: "#/definitions/RoleGetById"
+          summary: "Update an Role"
+          description: "Update an Role"
+          consumes:
+            - "application/json"
+          produces:
+            - "application/json"
+          responses:
+            "200":
+              description: "An updated role"
+              schema:
+                allOf:
+                  - $ref: "#/definitions/Response"
+                  - properties:
+                      data:
+                        $ref: "#/definitions/RoleGet"
+                      message:
+                        example: "Role successfully updated"
+                      message_code:
+                        example: "ROLE_SUCCESSFULLY_UPDATED"
+            "500":
+              description: "Internal Server Error"
+              schema:
+                $ref: "#/definitions/InternalErrorResponse"
+
+            "422":
+              description: "Invalid Id"
+              schema:
+                allOf:
+                  - $ref: "#/definitions/ErrorResponse"
+                  - properties:
+                      message:
+                        example: "Invalid Id"
+                      message_code:
+                        example: "INVALID_ID"
   /role/{RoleId}:
     get:
       tags:
@@ -1138,56 +1213,6 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-    put:
-        tags:
-          - "Roles"
-        parameters:
-          - name: "RoleId"
-            in: "path"
-            description: "ID of role to update"
-            required: true
-            type: "integer"
-            format: "integer"
-          - in: "body"
-            name: "body"
-            description: "Role object that needs to be updated"
-            required: true
-            schema:
-              $ref: "#/definitions/RolePost"
-        summary: "Update an Role"
-        description: "Update an Role"
-        consumes:
-          - "application/json"
-        produces:
-          - "application/json"
-        responses:
-          "200":
-            description: "An updated role"
-            schema:
-              allOf:
-                - $ref: "#/definitions/Response"
-                - properties:
-                    data:
-                      $ref: "#/definitions/RoleGet"
-                    message:
-                      example: "Role successfully updated"
-                    message_code:
-                      example: "ROLE_SUCCESSFULLY_UPDATED"
-          "500":
-            description: "Internal Server Error"
-            schema:
-              $ref: "#/definitions/InternalErrorResponse"
-
-          "422":
-            description: "Invalid Id"
-            schema:
-              allOf:
-                - $ref: "#/definitions/ErrorResponse"
-                - properties:
-                    message:
-                      example: "Invalid Id"
-                    message_code:
-                      example: "INVALID_ID"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
