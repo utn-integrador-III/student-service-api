@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from decouple import config
+from bson.objectid import ObjectId
 
 
 class Connection:
@@ -23,10 +24,11 @@ class Connection:
 
     def get_by_id(self, id):
         try:
-            result = self.collection.find({'id':id})
+            result = self.collection.find_one({"_id":ObjectId(id)})
         except Exception as e:
             return e
         return result
+    
     def create_data(self, data):
         try:
             return self.collection.insert_one(data)
