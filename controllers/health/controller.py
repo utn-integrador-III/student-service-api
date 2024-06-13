@@ -14,7 +14,7 @@ class HealthController(Resource):
     def get(self):
         try:
             # Check connection status
-            HealthModel.contextDB()
+            info_db= HealthModel.getInfoDB()
             return ServerResponse(message='Connection to DB is OK',
                                         message_code=HEALTH_SUCCESSFULLY, status=StatusCode.OK)         
         except Exception as ex:
