@@ -64,4 +64,3 @@ class ZoneByIdController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
