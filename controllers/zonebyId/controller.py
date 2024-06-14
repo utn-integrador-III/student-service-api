@@ -5,6 +5,15 @@ import logging
 
 
 class ZoneByIdController(Resource):
+
+    route = "/zone/<string:id>"
+
+    """
+    Get all sites
+    """
+
+    def get(self):
+
     route = "/zone/<id>"
 
     def get(self, id):
@@ -30,3 +39,29 @@ class ZoneByIdController(Resource):
         except Exception as ex:
             logging.error(f"Error getting zone by id: {ex}")
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
+
+    """
+    Delete a zone by ID
+    """
+
+    def delete(self, id):
+        try:
+            result = ZoneModel.delete(id)
+            if result:
+                return ServerResponse(
+                    message="Zone successfully deleted",
+                    message_code=ZONE_SUCCESSFULLY_DELETED,
+                    status=StatusCode.OK,
+                )
+            else:
+                return ServerResponse(
+                    data={},
+                    message="The zone no exists and cannot be deleted.",
+                    message_codes=NO_DATA,
+                    status=StatusCode.OK,
+                )
+        except Exception as ex:
+            logging.exception(ex)
+            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
