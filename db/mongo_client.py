@@ -30,6 +30,11 @@ class Connection:
             return e
         return result
 
+            result = self.collection.find_one({"_id":ObjectId(id)})
+        except Exception as e:
+            return e
+        return result
+    
     def create_data(self, data):
         try:
             return self.collection.insert_one(data)

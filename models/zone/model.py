@@ -17,6 +17,7 @@ class ZoneModel:
 
         return info_db
 
+
     # @classmethod
     def get_by_id(id):
         return []
@@ -27,3 +28,12 @@ class ZoneModel:
             result = __dbmanager__.delete_data(str(id))
         except Exception as ex:
             raise Exception(ex)
+
+    
+        # @classmethod
+    def get_by_id(id):
+        try:
+            return __dbmanager__.get_by_id(id)
+        except Exception as ex:
+            raise Exception(f"Error fetching zone by id {id}: {ex}")
+
