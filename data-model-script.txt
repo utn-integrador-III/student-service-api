@@ -1,1 +1,0 @@
-##aqui se debe escribir el script para la creacion de collecciones de mongodb
