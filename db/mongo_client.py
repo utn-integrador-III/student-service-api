@@ -33,11 +33,6 @@ class Connection:
 
     def get_by_id(self, id):
         try:
-            result = self.collection.find({"id": id})
-        except Exception as e:
-            return e
-        return result
-
             result = self.collection.find_one({"_id":ObjectId(id)})
         except Exception as e:
             return e
