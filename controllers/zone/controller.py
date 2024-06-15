@@ -47,26 +47,26 @@ class ZoneController(Resource):
     """
     def post(self):
         try:
-            # Obtener datos del cuerpo de la solicitud
+            # Get data from the body of the request
             data = request.get_json()
 
-            # Validar campos requeridos
+            # Validate required name fields
             if not data.get("name"):
                 return ServerResponse(message='Name is required', 
                                       message_code=ZONE_NAME_REQUIRED, status=StatusCode.BAD_REQUEST)
             
-            # Validar campos requeridos
+            # Validate required localization fields
             if not data.get("location"):
                 return ServerResponse(message='Location is required', 
                                       message_code=ZONE_LOCATION_REQUIRED, status=StatusCode.BAD_REQUEST)
 
-            # Validar si la zona ya existe por nombre
+            # Validate if the zone already exists by name
             zone_exists = ZoneModel.get_by_name(data.get("name"))
             if zone_exists:
                 return ServerResponse(message='Zone already exists', 
                                       message_code=ZONE_ALREADY_EXIST, status=StatusCode.CONFLICT)
 
-            # Crear y guardar la nueva zona
+            # Create and save the new zone
             zone = ZoneModel.create(data)
             return ServerResponse(zone.to_dict(), message="Zone successfully created", 
                                   message_code=ZONE_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
