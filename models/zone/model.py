@@ -14,6 +14,7 @@ class ZoneModel:
             "name": self.name,
             "location": self.location,
         }
+
     # @classmethod
     def get_all():
         info_db = []
@@ -26,7 +27,7 @@ class ZoneModel:
                 raise Exception(ex)
 
         return info_db
-      
+
     @classmethod
     def get_by_name(cls, name):
 
@@ -39,7 +40,7 @@ class ZoneModel:
         except Exception as ex:
             logging.exception(ex)
             raise Exception("Failed to get zone by name: " + str(ex))
-        
+
     @classmethod
     def create(cls, data):
         try:
@@ -54,14 +55,16 @@ class ZoneModel:
     def delete(cls, id):
         try:
             result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
         except Exception as ex:
             raise Exception(ex)
 
-    
     @classmethod
     def get_by_id(id):
         try:
             return __dbmanager__.get_by_id(id)
         except Exception as ex:
             raise Exception(f"Error fetching zone by id {id}: {ex}")
-
