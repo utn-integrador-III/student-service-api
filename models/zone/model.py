@@ -4,9 +4,10 @@ import logging
 
 class ZoneModel:
 
-    def __init__(self, name, location):
+    def __init__(self, name=None, location=None, _id=None):
         self.name = name
         self.location = location
+        self._id = _id
 
     def to_dict(self):
         return {
@@ -33,10 +34,12 @@ class ZoneModel:
     
     @classmethod
     def get_by_name(cls, name):
+
         try:
+            # Search for the zone by name in the database
             result = __dbmanager__.find_one({"name": name})
             if result:
-                return cls(**result)
+                return cls(_id=result.get("_id"), name=result.get("name"))
             return None
         except Exception as ex:
             logging.exception(ex)

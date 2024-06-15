@@ -62,6 +62,7 @@ class ZoneController(Resource):
 
             # Validate if the zone already exists by name
             zone_exists = ZoneModel.get_by_name(data.get("name"))
+
             if zone_exists:
                 return ServerResponse(message='Zone already exists', 
                                       message_code=ZONE_ALREADY_EXIST, status=StatusCode.CONFLICT)
