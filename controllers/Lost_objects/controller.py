@@ -1,4 +1,3 @@
-controllers/lost_objects/controller.py
 from flask_restful import Resource
 from utils.server_response import ServerResponse, StatusCode
 from utils.message_codes import *
