@@ -1,5 +1,5 @@
 from flask_restful import Resource
-
+from flask import request
 from utils.server_response import *
 from utils.message_codes import *
 from models.zone.model import ZoneModel
@@ -45,19 +45,32 @@ class ZoneController(Resource):
     """
     Create a new zone 
     """
-    # def post(self):
-    #     data = query_parser_save().parse_args()
-    #     try:
-    #         # Validate unique name
-    #         site_exists = SiteModel.get_by_name(data["name"], data["country_id"])
-    #         if site_exists:
-    #             return ServerResponse(message='Site aready exist',
-    #                                   message_code=SITE_ALREADY_EXIST, status=StatusCode.CONFLICT)
-    #         site = SiteModel(**data)
-    #         site.insert()
-    #         site = SiteModel.get_by_id(site._id)
-    #         return ServerResponse(site.to_dict(), message="Site successfully created",
-    #                               message_code=SITE_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
-    #     except Exception as ex:
-    #         logging.exception(ex)
-    #         return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+    def post(self):
+        try:
+            # Get data from the body of the request
+            data = request.get_json()
+
+            # Validate required name fields
+            if not data.get("name"):
+                return ServerResponse(message='Name is required', 
+                                      message_code=ZONE_NAME_REQUIRED, status=StatusCode.BAD_REQUEST)
+            
+            # Validate required localization fields
+            if not data.get("location"):
+                return ServerResponse(message='Location is required', 
+                                      message_code=ZONE_LOCATION_REQUIRED, status=StatusCode.BAD_REQUEST)
+
+            # Validate if the zone already exists by name
+            zone_exists = ZoneModel.get_by_name(data.get("name"))
+
+            if zone_exists:
+                return ServerResponse(message='Zone already exists', 
+                                      message_code=ZONE_ALREADY_EXIST, status=StatusCode.CONFLICT)
+
+            # Create and save the new zone
+            zone = ZoneModel.create(data)
+            return ServerResponse(zone.to_dict(), message="Zone successfully created", 
+                                  message_code=ZONE_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
+        except Exception as ex:
+            logging.exception(ex)
+            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
