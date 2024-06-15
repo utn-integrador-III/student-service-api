@@ -1,4 +1,3 @@
-# controllers/lost_objects/parser.py
 from flask_restful import reqparse
 
 def query_parser_save():
