@@ -1,3 +1,4 @@
+from bson import ObjectId
 from models.zone.db_queries import __dbmanager__
 import logging
 
@@ -69,4 +70,17 @@ class ZoneModel:
             return __dbmanager__.get_by_id(id)
         except Exception as ex:
             raise Exception(f"Error fetching zone by id {id}: {ex}")
+    
+    @classmethod
+    def update(cls, id, update_data):
+        if not isinstance(id, str) or not ObjectId.is_valid(id):
+            raise ValueError("Invalid id value")
+
+        id = ObjectId(id)
+        result = __dbmanager__.update_data(id, update_data)
+        if result:
+            updated_zone = cls.get_by_id(str(id))
+            return updated_zone
+        else:
+            return None
 
