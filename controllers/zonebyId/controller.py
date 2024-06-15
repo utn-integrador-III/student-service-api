@@ -11,7 +11,7 @@ class ZoneByIdController(Resource):
     """
     Get all sites
     """
-
+    
     def get(self, id):
         try:
             result = ZoneModel.get_by_id(id)
