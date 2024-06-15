@@ -29,7 +29,10 @@ class ZoneModel:
     
     # @classmethod
     def get_by_id(id):
-        return []
+        try:
+            return __dbmanager__.get_by_id(id)
+        except Exception as ex:
+            raise Exception(f"Error fetching zone by id {id}: {ex}")
 
     
     @classmethod
