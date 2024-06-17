@@ -24,7 +24,7 @@ class CategoryController(Resource):
             if not categories:
                 return ServerResponse(
                     data={},
-                    message="No zones found",
+                    message="No categories found",
                     message_codes=NO_DATA,
                     status=StatusCode.OK,
                 )
@@ -128,7 +128,7 @@ class CategoryByIdController(Resource):
             if CategoryModel.delete(id):
                 return ServerResponse(
                     message="Category successfully deleted",
-                    message_code=ZONE_SUCCESSFULLY_DELETED,
+                    message_code=CATEGORY_SUCCESFULLY_DELETED,
                     status=StatusCode.OK,
                 )
             else:
