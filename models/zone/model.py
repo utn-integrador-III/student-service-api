@@ -7,6 +7,18 @@ import logging
 class ZoneModel:
 
     @staticmethod
+    def __init__(self, name=None, location=None, _id=None):
+        self.name = name
+        self.location = location
+        self._id = _id
+
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "location": self.location,
+        }
+
+    # @classmethod
     def get_all():
         """
         Retrieve all zones from the database.
@@ -22,11 +34,42 @@ class ZoneModel:
 
         return info_db
 
-    @staticmethod
-    def get_by_id(id):
-        """
-        Retrieve a zone by its ID.
-        """
+    @classmethod
+    def get_by_name(cls, name):
+
+        try:
+            # Search for the zone by name in the database
+            result = __dbmanager__.find_one({"name": name})
+            if result:
+                return cls(_id=result.get("_id"), name=result.get("name"))
+            return None
+        except Exception as ex:
+            logging.exception(ex)
+            raise Exception("Failed to get zone by name: " + str(ex))
+
+    @classmethod
+    def create(cls, data):
+        try:
+            zone = cls(**data)
+            __dbmanager__.create_data(zone.to_dict())  # Insert data as a dictionary
+            return zone
+        except Exception as ex:
+            logging.exception(ex)
+            raise Exception("Failed to create zone: " + str(ex))
+
+    @classmethod
+    def delete(cls, id):
+        try:
+            result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            raise Exception(ex)
+
+    @classmethod
+    def get_by_id(cls, id):
         try:
             # Ensure the id is a valid ObjectId
             if not ObjectId.is_valid(id):
@@ -56,3 +99,16 @@ class ZoneModel:
         except Exception as ex:
             logging.error(f"Error deleting zone by id {id}: {ex}")
             raise Exception(f"Error deleting zone by id {id}: {ex}")
+
+    @classmethod
+    def update(cls, id, update_data):
+        if not isinstance(id, str) or not ObjectId.is_valid(id):
+            raise ValueError("Invalid id value")
+
+        id = ObjectId(id)
+        result = __dbmanager__.update_data(id, update_data)
+        if result:
+            updated_zone = cls.get_by_id(str(id))
+            return updated_zone
+        else:
+            return None

@@ -23,29 +23,33 @@ class Connection:
             return e
         return result
 
+    def find_one(self, name):
+        try:
+            result = self.collection.find_one(name)
+            return result
+        except Exception as e:
+            logging.exception(e)
+            return str(e)
+
     def get_by_id(self, id):
         try:
-            result = self.collection.find({"id": id})
+            result = self.collection.find_one({"_id": ObjectId(id)})
         except Exception as e:
             return e
         return result
 
-            result = self.collection.find_one({"_id":ObjectId(id)})
-        except Exception as e:
-            return e
-        return result
-    
     def create_data(self, data):
         try:
             return self.collection.insert_one(data)
         except Exception as e:
             return e
 
-    def update_data(self, id, new_deal_data):
+    def update_data(self, filter_id, new_data):
         try:
-            self.collection.update_one({"id": id}, {"$set": new_deal_data})
+            self.collection.update_one({"_id": ObjectId(filter_id)}, {"$set": new_data})
         except Exception as e:
-            return e
+            logging.exception(e)
+            raise e
 
     def delete_data(self, id):
         try:
