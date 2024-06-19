@@ -22,7 +22,7 @@ class Connection:
         except Exception as e:
             return e
         return result
-    
+
     def find_one(self, name):
         try:
             result = self.collection.find_one(name)
@@ -43,6 +43,13 @@ class Connection:
             return self.collection.insert_one(data)
         except Exception as e:
             return e
+
+    def update_data(self, filter_id, new_data):
+        try:
+            self.collection.update_one({"_id": ObjectId(filter_id)}, {"$set": new_data})
+        except Exception as e:
+            logging.exception(e)
+            raise e
 
     def update_data(self, id, new_data):
         try:
