@@ -44,11 +44,13 @@ class Connection:
         except Exception as e:
             return e
 
-    def update_data(self, id, new_deal_data):
+    def update_data(self, id, new_data):
         try:
-            self.collection.update_one({"id": id}, {"$set": new_deal_data})
+            result = self.collection.update_one({"_id": ObjectId(id)}, {"$set": new_data})
+            return result.modified_count > 0
         except Exception as e:
-            return e
+            logging.exception(e)
+            return str(e)
 
     def delete_data(self, id):
         try:

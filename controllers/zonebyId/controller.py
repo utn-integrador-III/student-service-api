@@ -1,4 +1,3 @@
-from distutils import errors
 from flask_restful import Resource
 from utils.server_response import *
 from models.zone.model import ZoneModel
@@ -70,3 +69,6 @@ class ZoneByIdController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+        
+   
+    
