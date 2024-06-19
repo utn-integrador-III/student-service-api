@@ -2,6 +2,7 @@ from flask_restful import Resource
 from utils.server_response import *
 from models.zone.model import ZoneModel
 import logging
+from bson.errors import InvalidId
 
 
 class ZoneByIdController(Resource):
@@ -32,6 +33,15 @@ class ZoneByIdController(Resource):
                     status=StatusCode.OK,
                 )
 
+        except InvalidId as ex:
+            logging.error(f"Invalid ObjectId: {ex}")
+            return ServerResponse(
+                data={},
+                message="Invalid zone ID",
+                message_code=INVALID_ID,
+                status=StatusCode.BAD_REQUEST,
+            )
+
         except Exception as ex:
             logging.error(f"Error getting zone by id: {ex}")
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
@@ -59,3 +69,6 @@ class ZoneByIdController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+        
+   
+    

@@ -30,6 +30,16 @@ ZONE_DELETE_HAS_RELATIONS = "ZONE_DELETE_HAS_RELATIONS"  # Zone cannot be delete
 ZONE_ALREADY_EXIST = "ZONE_ALREADY_EXIST"  # Zone already exist from database
 ZONE_NAME_REQUIRED = "ZONE_NAME_REQUIRED"  # Requerid zone name
 ZONE_LOCATION_REQUIRED = "ZONE_LOCATION_REQUIRED"  # Requerid zone location
+
+ZONE_NOT_FOUND = 'ZONE_NOT_FOUND' # Zone not found
+ZONE_SUCCESSFULLY_UPDATED = "ZONE_SUCCESSFULLY_UPDATED" # Zone successfully updated
+ZONE_SUCCESSFULLY_DELETED = "ZONE_SUCCESSFULLY_DELETED" # Zone successfully deleted
+ZONE_SUCCESSFULLY_CREATED = "ZONE_SUCCESSFULLY_CREATED" # Zone created successfully
+ZONE_DELETE_HAS_RELATIONS = "ZONE_DELETE_HAS_RELATIONS" # Zone cannot be deleted, has relationships with some categories
+ZONE_ALREADY_EXIST = 'ZONE_ALREADY_EXIST' #Zone already exist from database
+ZONE_NAME_REQUIRED = 'ZONE_NAME_REQUIRED' # Requerid zone name
+ZONE_LOCATION_REQUIRED = 'ZONE_LOCATION_REQUIRED' #Requerid zone location
+INCORRECT_REQUEST_PARAM='COLUMN_NOT_FOUND'
 # OBJECT LOST Validations Message
 
 
