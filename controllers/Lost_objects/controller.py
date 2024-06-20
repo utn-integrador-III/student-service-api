@@ -70,6 +70,15 @@ class LostObjectsController(Resource):
             # Set claim_date to None
             data["claim_date"] = None
 
+            # Set the claimer to None
+            data["claimer"] = ""
+
+            # Set the safekeeper as an empty array initially
+            data["safekeeper"] = [
+                {"accepted": False, "user_email": "mmedina@utn.ac.cr"},
+                {"accepted": False, "user_email": "yarguedas@utn.ac.cr"}
+            ]
+
             # Create and save the new lost object
             lost_object = LostObjectModel.create(data)
             return ServerResponse(lost_object.to_dict(), message="Lost_object successfully created", 
