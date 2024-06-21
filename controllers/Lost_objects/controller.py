@@ -56,29 +56,40 @@ class LostObjectsController(Resource):
                 return ServerResponse(message='Invalid email domain', 
                                     message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
             
-            object_exists = LostObjectModel.get_by_name(data.get("name"))
-            if object_exists:
-                return ServerResponse(message='Lost_object already exists', 
-                                    message_code=LOST_OBJECTS_EXIST, status=StatusCode.CONFLICT)
-
+            safekeepers = data.get("safekeeper")
+            if not safekeepers or not isinstance(safekeepers, list):
+                return ServerResponse(message='Safekeeper list is required', 
+                                      message_code=LOST_OBJECTS_SAFEKEEPER_REQUIRED, status=StatusCode.BAD_REQUEST)
+            
+            validated_safekeepers = []
+            for sk in safekeepers:
+                email = sk.get("user_email")
+                if not email or not re.match(r"^[\w\.-]+@utn\.ac\.cr$", email):  
+                    return ServerResponse(message=f'Invalid email domain for safekeeper: {email}', 
+                                          message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
+                validated_safekeepers.append({"accepted": False, "user_email": email})
+        
             data["status"] = "Pending"
-
             data["creation_date"] = datetime.now(pytz.timezone('America/Costa_Rica')).replace(tzinfo=None)
-
             data["attachment_path"] = '/lostObjects'
-
             data["claim_date"] = None
-
             data["claimer"] = ""
-
-            data["safekeeper"] = [
-                {"accepted": False, "user_email": "mmedina@utn.ac.cr"},
-                {"accepted": False, "user_email": "yarguedas@utn.ac.cr"}
-            ]
-
+            data["safekeeper"] = validated_safekeepers
             data["user_email"] = user_email
 
-            lost_object = LostObjectModel.create(data)
+            ordered_data = {
+                "name": data["name"],
+                "description": data["description"],
+                "status": data["status"],
+                "creation_date": data["creation_date"],
+                "attachment_path": data["attachment_path"],
+                "claim_date": data["claim_date"],
+                "claimer": data["claimer"],
+                "safekeeper": data["safekeeper"],
+                "user_email": data["user_email"]
+            }
+
+            lost_object = LostObjectModel.create(ordered_data)
             return ServerResponse(lost_object.to_dict(), message="Lost_object successfully created", 
                                 message_code=LOST_OBJECTS_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
 
