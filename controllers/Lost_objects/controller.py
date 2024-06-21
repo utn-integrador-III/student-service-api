@@ -8,6 +8,7 @@ from datetime import datetime
 from controllers.Lost_objects.parser import query_parser_save
 import logging
 import pytz
+import re
 
 class LostObjectsController(Resource):
     route = '/lostObject'
@@ -45,32 +46,38 @@ class LostObjectsController(Resource):
             # Validate required name fields
             if not data.get("name"):
                 return ServerResponse(message='Name is required', 
-                                      message_code=LOST_OBJECTS_NAME_REQUIRED, status=StatusCode.BAD_REQUEST)
+                                    message_code=LOST_OBJECTS_NAME_REQUIRED, status=StatusCode.BAD_REQUEST)
 
             # Validate required description fields
             if not data.get("description"):
                 return ServerResponse(message='Description is required', 
-                                      message_code=LOST_OBJECTS_DESCRIPTION_REQUIRED, status=StatusCode.BAD_REQUEST)
-
+                                    message_code=LOST_OBJECTS_DESCRIPTION_REQUIRED, status=StatusCode.BAD_REQUEST)
+            
+            # Validate user email
+            user_email = data.get("user_email")
+            if not user_email or not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", user_email):
+                return ServerResponse(message='Invalid email domain', 
+                                    message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
+            
             # Validate if the lost object already exists by name
             object_exists = LostObjectModel.get_by_name(data.get("name"))
             if object_exists:
                 return ServerResponse(message='Lost_object already exists', 
-                                      message_code=LOST_OBJECTS_EXIST, status=StatusCode.CONFLICT)
+                                    message_code=LOST_OBJECTS_EXIST, status=StatusCode.CONFLICT)
 
             # Set the status to "Pending"
             data["status"] = "Pending"
 
-            # Set the attachment path to "/lost Objects"
-            data["attachment_path"] = '/lostObjects'
-
             # Set the creation date to Costa Rica time
             data["creation_date"] = datetime.now(pytz.timezone('America/Costa_Rica')).replace(tzinfo=None)
+
+            # Set the attachment path to "/lost Objects"
+            data["attachment_path"] = '/lostObjects'
 
             # Set claim_date to None
             data["claim_date"] = None
 
-            # Set the claimer to None
+            # Set the claimer to empty string
             data["claimer"] = ""
 
             # Set the safekeeper as an empty array initially
@@ -79,10 +86,13 @@ class LostObjectsController(Resource):
                 {"accepted": False, "user_email": "yarguedas@utn.ac.cr"}
             ]
 
+            # set user_email to the data
+            data["user_email"] = user_email
+
             # Create and save the new lost object
             lost_object = LostObjectModel.create(data)
             return ServerResponse(lost_object.to_dict(), message="Lost_object successfully created", 
-                                  message_code=LOST_OBJECTS_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
+                                message_code=LOST_OBJECTS_SUCCESSFULLY_CREATED, status=StatusCode.CREATED)
 
         except Exception as ex:
             logging.exception(ex)
