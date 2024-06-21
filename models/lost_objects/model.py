@@ -73,15 +73,14 @@ class LostObjectModel():
     def create(cls, data):
         try:
             if 'creation_date' in data and isinstance(data['creation_date'], datetime):
-                data['creation_date'] = data['creation_date'].replace(tzinfo=None)  # Remove timezone info for MongoDB
+                data['creation_date'] = data['creation_date'].replace(tzinfo=None)  
             if 'claim_date' in data and isinstance(data['claim_date'], datetime):
-                data['claim_date'] = data['claim_date'].replace(tzinfo=None)  # Remove timezone info for MongoDB
+                data['claim_date'] = data['claim_date'].replace(tzinfo=None)  
 
-            # Reorder the dictionary so that user_email is the last key
             reordered_data = {key: data[key] for key in data if key != 'user_email'}
             reordered_data['user_email'] = data['user_email']
 
-            __dbmanager__.create_data(reordered_data)  # Insert data as a dictionary
+            __dbmanager__.create_data(reordered_data) 
             return cls(**data)
         except Exception as ex:
             logging.exception(ex)
