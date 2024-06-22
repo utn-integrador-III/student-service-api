@@ -82,9 +82,6 @@ definitions:
       _id:
         type: string
         example: "0183IEHU#&#J"
-      ZoneID:
-        type: integer
-        example: 34
       name:
         type: string
         example: "Laboratories"
@@ -413,6 +410,16 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+        "404":
+          description: "Data required"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Data required"
+                  message_code:
+                    example: "Data required"
     put:
         tags:
           - "Zones"
@@ -457,6 +464,27 @@ paths:
                       example: "Invalid Id"
                     message_code:
                       example: "INVALID_ID"
+
+          "400":
+            description: "Bad Request"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "No valid data provided for update"
+                    message_code:
+                      example: "INCORRECT_REQUEST_PARAM"
+          "404":
+            description: "Zone not found"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Zone does not exist"
+                    message_code:
+                      example: "ZONE_NOT_FOUND"
   /zone/{zoneId}:
     get:
       tags:
