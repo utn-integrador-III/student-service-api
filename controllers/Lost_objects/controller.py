@@ -23,7 +23,6 @@ class LostObjectsController(Resource):
                 return ServerResponse(data={}, message="No lost objects found", message_codes=NO_DATA, status=StatusCode.OK)
 
             def convert_object_id(obj):
-                """Convierte ObjectId a string y fechas a formato ISO."""
                 if isinstance(obj, dict):
                     for key, value in obj.items():
                         if isinstance(value, ObjectId):
