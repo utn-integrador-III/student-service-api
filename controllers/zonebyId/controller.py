@@ -84,8 +84,8 @@ class ZoneByIdController(Resource):
             logging.exception(f"Error deleting zone by id: {ex}")
             return ServerResponse(
                 data=None,
-                message="An error occurred while trying to delete the zone.",
-                message_code=ERROR_DELETE,
+                message="Internal server error",
+                message_code=INTERNAL_SERVER_ERROR_MSG,
                 status=StatusCode.INTERNAL_SERVER_ERROR,
             )
         
