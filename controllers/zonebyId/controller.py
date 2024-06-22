@@ -69,7 +69,7 @@ class ZoneByIdController(Resource):
                 return ServerResponse(
                     data=None,
                     message="Zone not found",
-                    message_code=ZONE_ITEM_NOT_FOUND,  # Changed from message_codes to message_code
+                    message_code=ZONE_ITEM_NOT_FOUND,
                     status=StatusCode.OK,
                 )
         except InvalidId as ex:
