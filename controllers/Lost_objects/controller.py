@@ -4,6 +4,7 @@ from utils.message_codes import *
 from models.lost_objects.model import LostObjectModel
 import logging
 from datetime import datetime
+from bson import ObjectId  # Importar ObjectId para comprobación de tipo
 
 class LostObjectsController(Resource):
     route = '/lostObjects'
@@ -21,11 +22,21 @@ class LostObjectsController(Resource):
             if not lost_objects:  # If there are no lost objects
                 return ServerResponse(data={}, message="No lost objects found", message_codes=NO_DATA, status=StatusCode.OK)
 
-            # Convert ObjectId to string and datetime to ISO format string
-            for obj in lost_objects:
-                obj['_id'] = str(obj['_id'])
-                obj['creation_date'] = obj['creation_date'].isoformat() if obj.get('creation_date') else None
-                obj['claim_date'] = obj['claim_date'].isoformat() if obj.get('claim_date') else None
+            def convert_object_id(obj):
+                """Convierte ObjectId a string y fechas a formato ISO."""
+                if isinstance(obj, dict):
+                    for key, value in obj.items():
+                        if isinstance(value, ObjectId):
+                            obj[key] = str(value)
+                        elif isinstance(value, datetime):
+                            obj[key] = value.isoformat()
+                        elif isinstance(value, list):
+                            obj[key] = [convert_object_id(item) for item in value]
+                        elif isinstance(value, dict):
+                            obj[key] = convert_object_id(value)
+                return obj
+
+            lost_objects = [convert_object_id(obj) for obj in lost_objects]
 
             return ServerResponse(data=lost_objects, status=StatusCode.OK)
         except Exception as ex:
