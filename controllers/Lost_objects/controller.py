@@ -52,9 +52,12 @@ class LostObjectsController(Resource):
                                     message_code=LOST_OBJECTS_DESCRIPTION_REQUIRED, status=StatusCode.BAD_REQUEST)
             
             user_email = data.get("user_email")
-            if not user_email or not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", user_email):
+            if not user_email:
+                return ServerResponse(message='User email is required', 
+                                      message_code=LOST_OBJECTS_USER_EMAIL_REQUIRED, status=StatusCode.BAD_REQUEST)
+            if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", user_email):
                 return ServerResponse(message='Invalid email domain', 
-                                    message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
+                                      message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
             
             safekeepers = data.get("safekeeper")
             if not safekeepers or not isinstance(safekeepers, list):
