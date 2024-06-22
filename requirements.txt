@@ -1,6 +1,7 @@
 Flask
 Flask-RESTful
 Flask-Cors
+pytz
 swagger-ui-py==21.12.8
 pymongo
 dnspython
