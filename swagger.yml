@@ -85,10 +85,10 @@ definitions:
       name:
         type: string
         example: "Laboratories"
-      description:
+      Location:
         type: string
         example: Laboratories Zone
-  ZoneGetById:
+  ZonePut:
     type: object
     properties:
       _id:
@@ -97,6 +97,9 @@ definitions:
       name:
         type: string
         example: "Laboratories"
+      Location:
+        type: string
+        example: "Laboratories Zone"
   ZonePost:
     type: object
     required:
@@ -106,6 +109,7 @@ definitions:
         type: string
         example: "Laboratories"
       description:
+      Location:
         type: string
         example: "Laboratories Zone"
   AuthGet:
@@ -393,9 +397,9 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Country successfully created"
+                    example: "Zone successfully created"
                   message_code:
-                    example: "COUNTRY_SUCCESSFULLY_CREATED"
+                    example: "Zone_SUCCESSFULLY_CREATED"
         "409":
           description: "Zone already exists"
           schema:
@@ -429,7 +433,7 @@ paths:
             description: "Zone object that needs to be updated"
             required: true
             schema:
-              $ref: "#/definitions/ZoneGetById"
+              $ref: "#/definitions/ZonePut"
         summary: "Update a Zone"
         description: "Update a Zone"
         consumes:
