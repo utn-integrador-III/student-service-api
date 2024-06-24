@@ -504,11 +504,6 @@ paths:
                             - properties:
                                   data:
                                       $ref: '#/definitions/ZoneGet'
-                                      message:
-                                          example: 'Zone found'
-                                      message_code:
-                                          example: 'OK_MSG'
-
                 '400':
                     description: 'Zone not found'
                     schema:
