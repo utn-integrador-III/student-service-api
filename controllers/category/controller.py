@@ -99,7 +99,7 @@ class CategoryByIdController(Resource):
             data = request.get_json()
             updated_count = CategoryModel.update(id, data)
 
-            if updated_count is None:
+            if updated_count is not None:
                 return ServerResponse(
                     data={},
                     message="Category successfully updated",
@@ -113,6 +113,7 @@ class CategoryByIdController(Resource):
                     message_code=NO_DATA,
                     status=StatusCode.NOT_FOUND,
                 )
+                
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(
@@ -121,6 +122,7 @@ class CategoryByIdController(Resource):
                 message_code=NO_DATA,
                 status=StatusCode.INTERNAL_SERVER_ERROR,
             )
+        
 
     # Delete a category by id
     def delete(self, id):
