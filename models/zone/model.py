@@ -1,12 +1,16 @@
+
+
+
+from distutils import errors
 from bson import ObjectId
 from bson.errors import InvalidId  # Import InvalidId class
+
 from models.zone.db_queries import __dbmanager__
 import logging
 
 
 class ZoneModel:
 
-    @staticmethod
     def __init__(self, name=None, location=None, _id=None):
         self.name = name
         self.location = location
@@ -20,17 +24,14 @@ class ZoneModel:
 
     # @classmethod
     def get_all():
-        """
-        Retrieve all zones from the database.
-        """
         info_db = []
-        try:
-            response = __dbmanager__.get_all_data()
-            for info in response:
+        response = __dbmanager__.get_all_data()
+
+        for info in response:
+            try:
                 info_db.append(info)
-        except Exception as ex:
-            logging.error(f"Error fetching all zones: {ex}")
-            raise Exception(f"Error fetching all zones: {ex}")
+            except Exception as ex:
+                raise Exception(ex)
 
         return info_db
 
@@ -76,30 +77,10 @@ class ZoneModel:
                 raise InvalidId(f"Invalid ObjectId: {id}")
             return __dbmanager__.get_by_id(id)
         except InvalidId as ex:
-            logging.error(f"Invalid ObjectId: {ex}")
             raise ex  # Re-raise InvalidId to handle it specifically in the get method
         except Exception as ex:
-            logging.error(f"Error fetching zone by id {id}: {ex}")
             raise Exception(f"Error fetching zone by id {id}: {ex}")
-
-    @staticmethod
-    def delete(id):
-        """
-        Delete a zone by its ID.
-        """
-        try:
-            # Ensure the id is a valid ObjectId
-            if not ObjectId.is_valid(id):
-                raise InvalidId(f"Invalid ObjectId: {id}")
-            result = __dbmanager__.delete_data(str(id))
-            return result
-        except InvalidId as ex:
-            logging.error(f"Invalid ObjectId: {ex}")
-            raise ex  # Re-raise InvalidId to handle it specifically in the delete method
-        except Exception as ex:
-            logging.error(f"Error deleting zone by id {id}: {ex}")
-            raise Exception(f"Error deleting zone by id {id}: {ex}")
-
+    
     @classmethod
     def update(cls, id, update_data):
         if not isinstance(id, str) or not ObjectId.is_valid(id):
@@ -112,3 +93,5 @@ class ZoneModel:
             return updated_zone
         else:
             return None
+
+

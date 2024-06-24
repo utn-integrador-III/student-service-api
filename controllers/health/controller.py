@@ -1,5 +1,4 @@
 from flask_restful import Resource
-
 from utils.server_response import *
 from utils.message_codes import *
 from models.health.model import HealthModel
