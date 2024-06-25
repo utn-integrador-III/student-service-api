@@ -227,9 +227,9 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/keeperResponse'
-      userID:
+      user_email:
         type: string
-        example: "89342037"
+        example: "diferretomo@utn.ac.cr"
   LostObjectGetById:
     type: object
     properties:
@@ -261,9 +261,9 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/keeperResponse'
-      userID:
+      user_email:
         type: string
-        example: "893420370"
+        example: "diferretomo@est.utn.ac.cr"
   LostObjectPost: 
     type: object
     required:
@@ -294,9 +294,9 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/keeperResponse'
-      userID:
+      user_email:
         type: string
-        example: "893420370"
+        example: "diferretomo@utn.ac.cr"
   RoleGet:
     type: object
     properties:
