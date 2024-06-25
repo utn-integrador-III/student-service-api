@@ -5,7 +5,7 @@ import logging
 from bson.errors import InvalidId
 
 
-class LostObjectController(Resource):
+class LostObjectByIdController(Resource):
 
     route = "/lostObject/<string:id>"
     
@@ -13,7 +13,7 @@ class LostObjectController(Resource):
     Get lostObject Report
     """
     
-    def get(self, id):
+    def get(self,id):
         try:
             result = LostObjectModel.get_by_id(id)
             if result:

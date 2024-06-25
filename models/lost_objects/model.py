@@ -35,7 +35,7 @@ class LostObjectModel():
         }
 
     @classmethod
-    def get_all():
+    def get_all(self):
         info_db = []
         response = __dbmanager__.get_all_data()    
         
