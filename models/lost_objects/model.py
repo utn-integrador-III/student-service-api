@@ -34,7 +34,7 @@ class LostObjectModel():
             "user_email": self.user_email
         }
 
-    # @classmethod
+    @classmethod
     def get_all():
         info_db = []
         response = __dbmanager__.get_all_data()    
@@ -85,3 +85,27 @@ class LostObjectModel():
         except Exception as ex:
             logging.exception(ex)
             raise Exception("Failed to create lost object: " + str(ex))
+    
+    @classmethod
+    def delete(cls, id):
+        try:
+            result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            raise Exception(ex)
+        
+
+    @classmethod
+    def get_by_id(cls, id):
+        try:
+            # Ensure the id is a valid ObjectId
+            if not ObjectId.is_valid(id):
+                raise InvalidId(f"Invalid ObjectId: {id}")
+            return __dbmanager__.get_by_id(id)
+        except InvalidId as ex:
+            raise ex  # Re-raise InvalidId to handle it specifically in the get method
+        except Exception as ex:
+            raise Exception(f"Error fetching report by id {id}: {ex}")
