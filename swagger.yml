@@ -93,16 +93,13 @@ definitions:
       _id:
         type: string
         example: "0183IEHU#&#J"
-      ZoneID:
-        type: integer
-        example: 34
       name:
         type: string
         example: "Laboratories"
-      description:
+      Location:
         type: string
         example: Laboratories Zone
-  ZoneGetById:
+  ZonePut:
     type: object
     properties:
       _id:
@@ -111,6 +108,9 @@ definitions:
       name:
         type: string
         example: "Laboratories"
+      Location:
+        type: string
+        example: "Laboratories Zone"
   ZonePost:
     type: object
     required:
@@ -119,7 +119,7 @@ definitions:
       name:
         type: string
         example: "Laboratories"
-      description:
+      Location:
         type: string
         example: "Laboratories Zone"
   AuthGet:
@@ -438,9 +438,9 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Country successfully created"
+                    example: "Zone successfully created"
                   message_code:
-                    example: "COUNTRY_SUCCESSFULLY_CREATED"
+                    example: "Zone_SUCCESSFULLY_CREATED"
         "409":
           description: "Zone already exists"
           schema:
@@ -455,6 +455,16 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+        "404":
+          description: "Data required"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Data required"
+                  message_code:
+                    example: "Data required"
     put:
         tags:
           - "Zones"
@@ -464,7 +474,7 @@ paths:
             description: "Zone object that needs to be updated"
             required: true
             schema:
-              $ref: "#/definitions/ZoneGetById"
+              $ref: "#/definitions/ZonePut"
         summary: "Update a Zone"
         description: "Update a Zone"
         consumes:
@@ -499,6 +509,27 @@ paths:
                       example: "Invalid Id"
                     message_code:
                       example: "INVALID_ID"
+
+          "400":
+            description: "Bad Request"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "No valid data provided for update"
+                    message_code:
+                      example: "INCORRECT_REQUEST_PARAM"
+          "404":
+            description: "Zone not found"
+            schema:
+              allOf:
+                - $ref: "#/definitions/ErrorResponse"
+                - properties:
+                    message:
+                      example: "Zone does not exist"
+                    message_code:
+                      example: "ZONE_NOT_FOUND"
   /zone/{zoneId}:
     get:
       tags:
