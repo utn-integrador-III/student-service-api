@@ -11,12 +11,9 @@ import logging
 import pytz
 import re
 
-class LostObjectsController(Resource):
+class LostObjectsListController(Resource):
     route = '/lostObject'
 
-    """
-    Get all lost objects
-    """
     def get(self):
         try:
             lost_objects = LostObjectModel.get_all()
@@ -47,10 +44,8 @@ class LostObjectsController(Resource):
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-
     def post(self):
         try:
-        
             data = request.get_json()
 
             if not data.get("name"):
@@ -109,3 +104,58 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
+class LostObjectsDetailController(Resource):
+    route = '/lostObject/<string:object_id>'
+
+    def put(self, object_id):
+        try:
+            data = request.get_json()
+
+            if not ObjectId.is_valid(object_id):
+                return ServerResponse(message='Formato de ID inválido', message_code=INVALID_ID, status=StatusCode.BAD_REQUEST)
+
+            update_data = {}
+            if "name" in data:
+                update_data["name"] = data["name"]
+            if "description" in data:
+                update_data["description"] = data["description"]
+            if "status" in data:
+                update_data["status"] = data["status"]
+            if "attachment_path" in data:
+                update_data["attachment_path"] = data["attachment_path"]
+            if "claim_date" in data:
+                update_data["claim_date"] = datetime.fromisoformat(data["claim_date"]) if data["claim_date"] else None
+            if "claimer" in data:
+                update_data["claimer"] = data["claimer"]
+            if "safekeeper" in data:
+                safekeepers = data["safekeeper"]
+                if not isinstance(safekeepers, list):
+                    return ServerResponse(message='Lista de safekeepers inválida', message_code=INVALID_SAFEKEEPER_LIST, status=StatusCode.BAD_REQUEST)
+                validated_safekeepers = []
+                for sk in safekeepers:
+                    email = sk.get("user_email")
+                    if not email or not re.match(r"^[\w\.-]+@utn\.ac\.cr$", email):
+                        return ServerResponse(message=f'Dominio de correo electrónico inválido para safekeeper: {email}', message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
+                    validated_safekeepers.append({"accepted": False, "user_email": email})
+                update_data["safekeeper"] = validated_safekeepers
+            if "user_email" in data:
+                user_email = data["user_email"]
+                if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", user_email):
+                    return ServerResponse(message='Dominio de correo electrónico inválido', message_code=INVALID_EMAIL_DOMAIN, status=StatusCode.BAD_REQUEST)
+                update_data["user_email"] = user_email
+
+            if not update_data:
+                return ServerResponse(message='No hay campos válidos para actualizar', message_code=NO_FIELDS_TO_UPDATE, status=StatusCode.BAD_REQUEST)
+
+            update_result = LostObjectModel.update(object_id, update_data)
+
+            if update_result.matched_count == 0:
+                return ServerResponse(message='Objeto perdido no encontrado', message_code=NOT_FOUND, status=StatusCode.NOT_FOUND)
+
+            return ServerResponse(data=update_data, message='Objeto perdido actualizado con éxito', status=StatusCode.OK)
+
+        except Exception as ex:
+            logging.exception(ex)
+            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
