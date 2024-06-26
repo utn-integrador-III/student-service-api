@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from controllers.Lost_objects.controller import LostObjectsController
+from controllers.Lost_objects.controller import LostObjectsController, LostObjectByIdController
 from controllers.health.controller import HealthController
 from controllers.zone.controller import ZoneController
 from controllers.zonebyId.controller import ZoneByIdController
@@ -21,6 +21,7 @@ def addServiceLayer(api: Api):
     # Object Lost
 
     api.add_resource(LostObjectsController, LostObjectsController.route)
+    api.add_resource(LostObjectByIdController, LostObjectByIdController.routeById)
 
     # api.add_resource(Report, Area.route)
     # api.add_resource(ReportById, ReportById.route)
