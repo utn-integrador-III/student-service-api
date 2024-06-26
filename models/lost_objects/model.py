@@ -85,3 +85,14 @@ class LostObjectModel():
         except Exception as ex:
             logging.exception(ex)
             raise Exception("Failed to create lost object: " + str(ex))
+
+    @classmethod
+    def update(cls, object_id, update_data):
+        try:
+            result = __dbmanager__.collection.update_one({"_id": ObjectId(object_id)}, {"$set": update_data})
+            return result
+        except InvalidId:
+            raise Exception("Invalid ObjectId format")
+        except Exception as ex:
+            logging.exception(ex)
+            raise Exception("Failed to update lost object: " + str(ex))
