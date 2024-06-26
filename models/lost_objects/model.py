@@ -97,7 +97,6 @@ class LostObjectModel():
         except Exception as ex:
             raise Exception(ex)
         
-
     @classmethod
     def get_by_id(cls, id):
         try:
