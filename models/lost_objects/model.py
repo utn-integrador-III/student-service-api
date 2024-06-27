@@ -98,13 +98,19 @@ class LostObjectModel():
             raise Exception(ex)
         
     @classmethod
-    def get_by_id(cls, id):
-        try:
-            # Ensure the id is a valid ObjectId
-            if not ObjectId.is_valid(id):
-                raise InvalidId(f"Invalid ObjectId: {id}")
-            return __dbmanager__.get_by_id(id)
-        except InvalidId as ex:
-            raise ex  # Re-raise InvalidId to handle it specifically in the get method
-        except Exception as ex:
-            raise Exception(f"Error fetching report by id {id}: {ex}")
+    def _convert_object(cls, obj):
+        def convert_object_id(obj):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if isinstance(value, ObjectId):
+                        obj[key] = str(value)
+                    elif isinstance(value, datetime):
+                        obj[key] = value.isoformat()
+                    elif isinstance(value, list):
+                        obj[key] = [convert_object_id(item) for item in value]
+                    elif isinstance(value, dict):
+                        obj[key] = convert_object_id(value)
+            return obj
+
+        return convert_object_id(obj)
+        
