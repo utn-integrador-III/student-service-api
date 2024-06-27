@@ -26,7 +26,7 @@ class CategoryController(Resource):
                     data={},
                     message="No categories found",
                     message_codes=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
 
             for cat in categories:
@@ -87,7 +87,7 @@ class CategoryByIdController(Resource):
                     data={},
                     message="Category does not exist",
                     message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
         except Exception as ex:
             logging.error(ex)
@@ -111,14 +111,13 @@ class CategoryByIdController(Resource):
                     data={},
                     message="Category not found or category already exists",
                     message_code=NO_DATA,
-                    status=StatusCode.NOT_FOUND,
+                    status=StatusCode.BAD_REQUEST,
                 )
                 
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(
                 data={},
-                message="Category not found or category already exists.",
                 message_code=NO_DATA,
                 status=StatusCode.INTERNAL_SERVER_ERROR,
             )
@@ -138,7 +137,7 @@ class CategoryByIdController(Resource):
                     data={},
                     message="The category does not exist and cannot be deleted.",
                     message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
         except Exception as ex:
             logging.exception(ex)
