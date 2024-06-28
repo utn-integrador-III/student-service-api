@@ -40,10 +40,12 @@ class CategoryController(Resource):
     def post(self):
         try:
             data = request.get_json()
-            if not data.get("category_name"):
+            category_name = data.get('category_name', '').strip()
+            if not category_name:
                 return ServerResponse(
-                    message="Category name is required",
-                    message_code=CATEGORY_NAME_REQUIRED,
+                    data={},
+                    message="Category name cannot be empty",
+                    message_code=EMPTY_CATEGORY_NAME,
                     status=StatusCode.BAD_REQUEST,
                 )
 
@@ -97,6 +99,17 @@ class CategoryByIdController(Resource):
     def put(self, id):
         try:
             data = request.get_json()
+            updated_count = CategoryModel.update(id, data)
+            category_name = data.get('category_name', '').strip()
+
+            if not category_name:
+                return ServerResponse(
+                    data={},
+                    message="Category name cannot be empty",
+                    message_code=EMPTY_CATEGORY_NAME,
+                    status=StatusCode.BAD_REQUEST,
+                )
+
             updated_count = CategoryModel.update(id, data)
 
             if updated_count is None:
