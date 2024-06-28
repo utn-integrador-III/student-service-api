@@ -28,7 +28,7 @@ class LostObjectByIdController(Resource):
                     data={},
                     message=LOST_OBJECTS_NOT_FOUND,
                     message_code=NO_DATA,
-                    status=StatusCode.NOT_FOUND,
+                    status=StatusCode.BAD_REQUEST,
                 )
         except Exception as ex:
             logging.error(ex)
