@@ -27,11 +27,12 @@ class ZoneController(Resource):
 
             if not zones:  # If there are no zones
                 return ServerResponse(
-                    data={},
-                    message="No zones found",
-                    message_codes=NO_DATA,
-                    status=StatusCode.OK,
+                    data=None,
+                    message="Zones not found",
+                    message_code=NO_DATA,
+                    status=StatusCode.BAD_REQUEST,
                 )
+
 
             # Convert ObjectId to string
             for zone in zones:
