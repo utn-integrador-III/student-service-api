@@ -34,8 +34,8 @@ class LostObjectModel():
             "user_email": self.user_email
         }
 
-    # @classmethod
-    def get_all():
+    @classmethod
+    def get_all(self):
         info_db = []
         response = __dbmanager__.get_all_data()    
         
@@ -85,3 +85,32 @@ class LostObjectModel():
         except Exception as ex:
             logging.exception(ex)
             raise Exception("Failed to create lost object: " + str(ex))
+    
+    @classmethod
+    def delete(cls, id):
+        try:
+            result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def _convert_object(cls, obj):
+        def convert_object_id(obj):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if isinstance(value, ObjectId):
+                        obj[key] = str(value)
+                    elif isinstance(value, datetime):
+                        obj[key] = value.isoformat()
+                    elif isinstance(value, list):
+                        obj[key] = [convert_object_id(item) for item in value]
+                    elif isinstance(value, dict):
+                        obj[key] = convert_object_id(value)
+            return obj
+
+        return convert_object_id(obj)
+        
