@@ -52,8 +52,8 @@ class LostObjectModel:
             "user_email": self.user_email,
         }
 
-    # @classmethod
-    def get_all():
+    @classmethod
+    def get_all(self):
         info_db = []
         response = __dbmanager__.get_all_data()
 
@@ -115,6 +115,18 @@ class LostObjectModel:
             logging.error(ex)
             raise Exception(ex)
 
+    
+    @classmethod
+    def delete(cls, id):
+        try:
+            result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            raise Exception(ex)
+        
     @classmethod
     def _convert_object(cls, obj):
         def convert_object_id(obj):
@@ -131,3 +143,4 @@ class LostObjectModel:
             return obj
 
         return convert_object_id(obj)
+

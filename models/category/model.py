@@ -56,8 +56,10 @@ class CategoryModel:
     @classmethod
     def update(cls, id, data):
         try:
-            new_category_name = data.get("category_name")
+            new_category_name = data.get("category_name", "").strip()
             existing_category = cls.getByName(new_category_name)
+            if not new_category_name:
+                return None
             if existing_category and str(existing_category["_id"]) != id:
                 return None
             result = __dbmanager__.update_data(id, data)
