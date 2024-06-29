@@ -33,3 +33,27 @@ class LostObjectByIdController(Resource):
         except Exception as ex:
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
+    """
+    Delete a lostObject Report by ID
+    """
+
+    def delete(self, id):
+        try:
+            result = LostObjectModel.delete(id)
+            if result:
+                return ServerResponse(
+                    message="Report successfully deleted",
+                    message_code=LOST_OBJECTS_SUCCESSFULLY_DELETED,
+                    status=StatusCode.OK,
+                )
+            else:
+                return ServerResponse(
+                    data={},
+                    message="The report do not exist and cannot be deleted.",
+                    message_codes=NO_DATA,
+                    status=StatusCode.OK,
+                )
+        except Exception as ex:
+            logging.exception(ex)
+            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
