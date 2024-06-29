@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from controllers.Lost_objects.controller import LostObjectsController
-from controllers.Lost_objectsbyId.controller import LostObjectByIdController
+from controllers.lost_objectsbyid.controller import LostObjectByIdController
 from controllers.health.controller import HealthController
 from controllers.zone.controller import ZoneController
 from controllers.zonebyId.controller import ZoneByIdController
