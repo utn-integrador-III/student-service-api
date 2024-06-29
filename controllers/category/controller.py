@@ -69,6 +69,7 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
 
+
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
@@ -155,3 +156,4 @@ class CategoryByIdController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+
