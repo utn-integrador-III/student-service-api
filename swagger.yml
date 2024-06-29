@@ -939,6 +939,98 @@ paths:
                                       example: "Invalid Id"
                                   message_code:
                                       example: "INVALID_ID"
+    /LostObject/{ObjectId}:
+        get:
+            tags:
+                - "LostObjects"
+            summary: "Find LostObject by ID"
+            description: "Returns a single LostObject"
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - name: "ObjectId"
+                  in: "path"
+                  description: "ID of LostObject to return"
+                  required: true
+                  type: "integer"
+                  format: "integer"
+            responses:
+                "200":
+                    description: "Get single LostObject successfully"
+                    schema:
+                        allOf:
+                            - $ref: "#/definitions/Response"
+                            - properties:
+                                  data:
+                                      $ref: "#/definitions/LostObjectGet"
+                "400":
+                    description: "LostObject not found"
+                    schema:
+                        allOf:
+                            - $ref: "#/definitions/ErrorResponse"
+                            - properties:
+                                  message:
+                                      example: "LostObject not found"
+                                  message_code:
+                                      example: "NO_DATA"
+                "422":
+                    description: "Invalid LostObject Id"
+                    schema:
+                        $ref: "#/definitions/InvalidIdErrorResponse"
+                "500":
+                    description: "Internal Server Error"
+                    schema:
+                        $ref: "#/definitions/InternalErrorResponse"
+        delete:
+            tags:
+                - "LostObjects"
+            summary: "Delete LostObject by ID"
+            description: "Delete a LostObject by ID"
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - name: "ObjectId"
+                  in: "path"
+                  description: "ID of LostObject to delete"
+                  required: true
+                  type: "integer"
+            responses:
+                "200":
+                    description: "LostObject successfully deleted"
+                    schema:
+                        type: object
+                        properties:
+                            data:
+                                type: string
+                                example: null
+                            message:
+                                type: string
+                                example: "LostObject successfully deleted"
+                            message_code:
+                                type: string
+                                example: "LOSTOBJECT_SUCCESSFULLY_DELETED"
+                "400":
+                    description: "LostObject not found"
+                    schema:
+                        allOf:
+                            - $ref: "#/definitions/ErrorResponse"
+                            - properties:
+                                  message:
+                                      example: "LostObject not found"
+                                  message_code:
+                                      example: "LOSTOBJECT_ITEM_NOT_FOUND"
+                "422":
+                    description: "Invalid LostObject Id"
+                    schema:
+                        $ref: "#/definitions/InvalidIdErrorResponse"
+                "500":
+                    description: "Internal Server Error"
+                    schema:
+                        $ref: "#/definitions/InternalErrorResponse"
     /role/{RoleId}:
         get:
             tags:
