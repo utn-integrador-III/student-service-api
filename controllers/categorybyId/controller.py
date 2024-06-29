@@ -7,69 +7,6 @@ from controllers.category.parser import query_parser_save
 import logging
 
 
-class CategoryController(Resource):
-    route = "/category"
-
-    # Get all categories
-    def get(self):
-        try:
-            categories = CategoryModel.getAll()
-            if isinstance(categories, dict) and "error" in categories:
-                return ServerResponse(
-                    data={},
-                    message=categories["error"],
-                    status=StatusCode.INTERNAL_SERVER_ERROR,
-                )
-
-            if not categories:
-                return ServerResponse(
-                    data={},
-                    message="No categories found",
-                    message_codes=NO_DATA,
-                    status=StatusCode.OK,
-                )
-
-            for cat in categories:
-                cat["_id"] = str(cat["_id"])
-            return ServerResponse(data=categories, status=StatusCode.OK)
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
-    # Create a new category
-    def post(self):
-        try:
-            data = request.get_json()
-            category_name = data.get('category_name', '').strip()
-            if not category_name:
-                return ServerResponse(
-                    data={},
-                    message="Category name cannot be empty",
-                    message_code=EMPTY_CATEGORY_NAME,
-                    status=StatusCode.BAD_REQUEST,
-                )
-
-            category_exists = CategoryModel.getByName(data.get("category_name"))
-            if category_exists:
-                return ServerResponse(
-                    message="Category already exists",
-                    message_code=CATEGORY_ALREADY_EXISTS,
-                    status=StatusCode.CONFLICT,
-                )
-
-            category = CategoryModel.create(data)
-            return ServerResponse(
-                category.to_dict(),
-                message="Category successfully created",
-                message_code=CATEGORY_SUCCESFULLY_CREATED,
-                status=StatusCode.CREATED,
-            )
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
-
-
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
@@ -100,17 +37,6 @@ class CategoryByIdController(Resource):
     def put(self, id):
         try:
             data = request.get_json()
-            updated_count = CategoryModel.update(id, data)
-            category_name = data.get('category_name', '').strip()
-
-            if not category_name:
-                return ServerResponse(
-                    data={},
-                    message="Category name cannot be empty",
-                    message_code=EMPTY_CATEGORY_NAME,
-                    status=StatusCode.BAD_REQUEST,
-                )
-
             updated_count = CategoryModel.update(id, data)
 
             if updated_count is None:
@@ -155,4 +81,3 @@ class CategoryByIdController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
