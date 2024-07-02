@@ -1,6 +1,3 @@
-
-
-
 from distutils import errors
 from bson import ObjectId
 from bson.errors import InvalidId  # Import InvalidId class

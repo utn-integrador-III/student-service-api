@@ -26,7 +26,7 @@ class CategoryController(Resource):
                     data={},
                     message="No categories found",
                     message_codes=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
 
             for cat in categories:
@@ -40,10 +40,12 @@ class CategoryController(Resource):
     def post(self):
         try:
             data = request.get_json()
-            if not data.get("category_name"):
+            category_name = data.get('category_name', '').strip()
+            if not category_name:
                 return ServerResponse(
-                    message="Category name is required",
-                    message_code=CATEGORY_NAME_REQUIRED,
+                    data={},
+                    message="Category name cannot be empty",
+                    message_code=EMPTY_CATEGORY_NAME,
                     status=StatusCode.BAD_REQUEST,
                 )
 
@@ -67,6 +69,7 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
 
+
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
@@ -87,7 +90,7 @@ class CategoryByIdController(Resource):
                     data={},
                     message="Category does not exist",
                     message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
         except Exception as ex:
             logging.error(ex)
@@ -98,8 +101,19 @@ class CategoryByIdController(Resource):
         try:
             data = request.get_json()
             updated_count = CategoryModel.update(id, data)
+            category_name = data.get('category_name', '').strip()
 
-            if updated_count is None:
+            if not category_name:
+                return ServerResponse(
+                    data={},
+                    message="Category name cannot be empty",
+                    message_code=EMPTY_CATEGORY_NAME,
+                    status=StatusCode.BAD_REQUEST,
+                )
+
+            updated_count = CategoryModel.update(id, data)
+
+            if updated_count is not None:
                 return ServerResponse(
                     data={},
                     message="Category successfully updated",
@@ -111,16 +125,17 @@ class CategoryByIdController(Resource):
                     data={},
                     message="Category not found or category already exists",
                     message_code=NO_DATA,
-                    status=StatusCode.NOT_FOUND,
+                    status=StatusCode.BAD_REQUEST,
                 )
+                
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(
                 data={},
-                message="Category not found or category already exists.",
                 message_code=NO_DATA,
                 status=StatusCode.INTERNAL_SERVER_ERROR,
             )
+        
 
     # Delete a category by id
     def delete(self, id):
@@ -136,8 +151,9 @@ class CategoryByIdController(Resource):
                     data={},
                     message="The category does not exist and cannot be deleted.",
                     message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+

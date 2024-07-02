@@ -1,16 +1,17 @@
 from flask_restful import Resource
-from controllers.Lost_objects.controller import LostObjectsListController
+from controllers.Lost_objects.controller import LostObjectsController
 from controllers.lost_objectsbyid.controller import LostObjectsDetailController
+from controllers.lost_objectsbyid.controller import LostObjectByIdController
 from controllers.health.controller import HealthController
 from controllers.zone.controller import ZoneController
 from controllers.zonebyId.controller import ZoneByIdController
-from controllers.category.controller import CategoryController, CategoryByIdController
+from controllers.category.controller import CategoryController
+from controllers.categorybyId.controller import CategoryByIdController
 from flask_restful import Api
 
 def addServiceLayer(api: Api):
     # Health
     api.add_resource(HealthController, HealthController.route)
-    
     # Zone
     api.add_resource(ZoneController, ZoneController.route)
     api.add_resource(ZoneByIdController, ZoneByIdController.route)
@@ -19,6 +20,11 @@ def addServiceLayer(api: Api):
     api.add_resource(CategoryController, CategoryController.route)
     api.add_resource(CategoryByIdController, CategoryByIdController.routeById)
 
-    # Lost Objects
-    api.add_resource(LostObjectsListController, LostObjectsListController.route)
+    # Object Lost
+
+    api.add_resource(LostObjectsController, LostObjectsController.route)
     api.add_resource(LostObjectsDetailController, LostObjectsDetailController.route)
+
+    # api.add_resource(Report, Area.route)
+    # api.add_resource(ReportById, ReportById.route)
+    # api.add_resource(ReportByFilters, ReportByFilters.route)
