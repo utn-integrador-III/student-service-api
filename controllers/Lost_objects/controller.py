@@ -10,6 +10,11 @@ import pytz
 import re
 
 class LostObjectsListController(Resource):
+
+    """
+    Get all lost objects
+    """
+    
     route = '/lostObject'
 
     def get(self):
