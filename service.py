@@ -18,6 +18,6 @@ def addServiceLayer(api: Api):
     api.add_resource(CategoryController, CategoryController.route)
     api.add_resource(CategoryByIdController, CategoryByIdController.routeById)
 
-    # Object Lost
+    # Lost Objects
     api.add_resource(LostObjectsController, LostObjectsController.route)
-    api.add_resource(LostObjectByIdController, LostObjectByIdController.route)
+    api.add_resource(LostObjectByIdController, LostObjectByIdController.routeById)
