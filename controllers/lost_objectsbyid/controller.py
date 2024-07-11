@@ -1,17 +1,13 @@
 from flask_restful import Resource
-from flask import request
 from utils.server_response import ServerResponse, StatusCode
 from utils.message_codes import *
 from models.lost_objects.model import LostObjectModel
 import logging
-from controllers.Lost_objects.parser import query_parser_save
-import logging
-
+from bson import ObjectId
 
 class LostObjectByIdController(Resource):
     routeById = "/lostObject/<string:id>"
 
-    # Get a lost object by id
     def get(self, id):
         try:
             result = LostObjectModel.getById(id)
@@ -34,10 +30,6 @@ class LostObjectByIdController(Resource):
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-    """
-    Delete a lostObject Report by ID
-    """
-
     def delete(self, id):
         try:
             result = LostObjectModel.delete(id)
@@ -51,7 +43,7 @@ class LostObjectByIdController(Resource):
                 return ServerResponse(
                     data={},
                     message="The report do not exist and cannot be deleted.",
-                    message_codes=NO_DATA,
+                    message_code=NO_DATA,
                     status=StatusCode.OK,
                 )
         except Exception as ex:

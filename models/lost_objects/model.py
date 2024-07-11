@@ -144,3 +144,55 @@ class LostObjectModel:
 
         return convert_object_id(obj)
 
+
+    @classmethod
+    def getById(cls, id):
+        try:
+            result = __dbmanager__.get_by_id(id)
+            if result:
+                return cls._convert_object(result)
+            return None
+        except Exception as ex:
+            logging.error(ex)
+            raise Exception(ex)
+
+    
+    @classmethod
+    def delete(cls, id):
+        try:
+            result = __dbmanager__.delete_data(str(id))
+            if result:
+                return True
+            else:
+                return False
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def _convert_object(cls, obj):
+        def convert_object_id(obj):
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if isinstance(value, ObjectId):
+                        obj[key] = str(value)
+                    elif isinstance(value, datetime):
+                        obj[key] = value.isoformat()
+                    elif isinstance(value, list):
+                        obj[key] = [convert_object_id(item) for item in value]
+                    elif isinstance(value, dict):
+                        obj[key] = convert_object_id(value)
+            return obj
+
+        return convert_object_id(obj)
+
+
+    @classmethod
+    def update(cls, object_id, update_data):
+        try:
+            result = __dbmanager__.collection.update_one({"_id": ObjectId(object_id)}, {"$set": update_data})
+            return result
+        except InvalidId:
+            raise Exception("Invalid ObjectId format")
+        except Exception as ex:
+            logging.exception(ex)
+            raise Exception("Failed to update lost object: " + str(ex))
