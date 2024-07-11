@@ -12,7 +12,6 @@ from .parser import LostObjectParser
 
 class LostObjectsController(Resource):
     route = '/lostObject'
-    routeById = '/lostObject/<string:id>'
 
     def get(self):
         try:
