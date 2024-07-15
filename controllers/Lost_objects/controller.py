@@ -9,10 +9,12 @@ from bson import ObjectId
 import pytz
 import re
 from .parser import LostObjectParser
+from utils import auth_required
 
 class LostObjectsController(Resource):
     route = '/lostObject'
 
+    @auth_required(permission='read_lost_objects', with_args=True)
     def get(self):
         try:
             lost_objects = LostObjectModel.get_all()
@@ -50,7 +52,7 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
+    @auth_required(permission='create_lost_objects', with_args=True)
     def post(self):
         try:
             data = request.get_json()
@@ -134,7 +136,7 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
+    @auth_required(permission='update_lost_objects', with_args=True)
     def put(self):
         try:
             args = LostObjectParser.parse_put_request()

@@ -4,6 +4,7 @@ from utils.server_response import *
 from models.zone.model import ZoneModel
 import logging
 from bson.errors import InvalidId
+from utils import auth_required
 
 
 class ZoneByIdController(Resource):
@@ -13,7 +14,7 @@ class ZoneByIdController(Resource):
     """
     Get all sites
     """
-    
+    @auth_required(permission='read_zone', with_args=True)
     def get(self, id):
         try:
             result = ZoneModel.get_by_id(id)
@@ -51,7 +52,7 @@ class ZoneByIdController(Resource):
     Delete a zone by ID
     """
 
-
+    @auth_required(permission='delete_zone', with_args=True)
     def delete(self, id):
         try:
             # Validate if the id is a valid ObjectId

@@ -5,12 +5,14 @@ from utils.message_codes import *
 from models.category.model import CategoryModel
 from controllers.category.parser import query_parser_save
 import logging
+from utils import auth_required
 
 
 class CategoryController(Resource):
     route = "/category"
 
     # Get all categories
+    @auth_required(permission='read_category', with_args=True)    
     def get(self):
         try:
             categories = CategoryModel.getAll()
@@ -37,6 +39,7 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Create a new category
+    @auth_required(permission='create_category', with_args=True)
     def post(self):
         try:
             data = request.get_json()
@@ -64,95 +67,6 @@ class CategoryController(Resource):
                 message_code=CATEGORY_SUCCESFULLY_CREATED,
                 status=StatusCode.CREATED,
             )
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
-
-
-class CategoryByIdController(Resource):
-    routeById = "/category/<string:id>"
-
-    # Get a category by id
-    def get(self, id):
-        try:
-            result = CategoryModel.getById(id)
-            if result:
-                result["_id"] = str(result["_id"]) if "_id" in result else None
-                return ServerResponse(
-                    data=result,
-                    message="Category found",
-                    message_code=OK_MSG,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="Category does not exist",
-                    message_code=NO_DATA,
-                    status=StatusCode.BAD_REQUEST,
-                )
-        except Exception as ex:
-            logging.error(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
-    # Update an existing category by id
-    def put(self, id):
-        try:
-            data = request.get_json()
-            updated_count = CategoryModel.update(id, data)
-            category_name = data.get('category_name', '').strip()
-
-            if not category_name:
-                return ServerResponse(
-                    data={},
-                    message="Category name cannot be empty",
-                    message_code=EMPTY_CATEGORY_NAME,
-                    status=StatusCode.BAD_REQUEST,
-                )
-
-            updated_count = CategoryModel.update(id, data)
-
-            if updated_count is not None:
-                return ServerResponse(
-                    data={},
-                    message="Category successfully updated",
-                    message_code=CATEGORY_SUCCESFULLY_UPDATED,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="Category not found or category already exists",
-                    message_code=NO_DATA,
-                    status=StatusCode.BAD_REQUEST,
-                )
-                
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(
-                data={},
-                message_code=NO_DATA,
-                status=StatusCode.INTERNAL_SERVER_ERROR,
-            )
-        
-
-    # Delete a category by id
-    def delete(self, id):
-        try:
-            if CategoryModel.delete(id):
-                return ServerResponse(
-                    message="Category successfully deleted",
-                    message_code=CATEGORY_SUCCESFULLY_DELETED,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="The category does not exist and cannot be deleted.",
-                    message_code=NO_DATA,
-                    status=StatusCode.BAD_REQUEST,
-                )
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)

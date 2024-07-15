@@ -4,10 +4,11 @@ from utils.message_codes import *
 from models.lost_objects.model import LostObjectModel
 import logging
 from bson import ObjectId
+from utils import auth_required
 
 class LostObjectByIdController(Resource):
     routeById = "/lostObject/<string:id>"
-
+    @auth_required(permission='read_lost_objects', with_args=True)
     def get(self, id):
         try:
             result = LostObjectModel.getById(id)
@@ -29,7 +30,7 @@ class LostObjectByIdController(Resource):
         except Exception as ex:
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
+    @auth_required(permission='delete_lost_objects', with_args=True)
     def delete(self, id):
         try:
             result = LostObjectModel.delete(id)

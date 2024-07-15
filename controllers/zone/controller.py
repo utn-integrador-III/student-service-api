@@ -5,6 +5,7 @@ from utils.message_codes import *
 from models.zone.model import ZoneModel
 from controllers.zone.parser import query_parser_save
 import logging
+from utils import auth_required
 
 
 class ZoneController(Resource):
@@ -13,7 +14,7 @@ class ZoneController(Resource):
     """
     Get all zones
     """
-
+    @auth_required(permission='read_zone', with_args=True)
     def get(self):
         try:
             zones = ZoneModel.get_all()
@@ -46,6 +47,7 @@ class ZoneController(Resource):
     """
     Create a new zone 
     """
+    @auth_required(permission='create_zone', with_args=True)
     def post(self):
         try:
             # Get data from the body of the request
@@ -76,7 +78,7 @@ class ZoneController(Resource):
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-
+    @auth_required(permission='delete_zone', with_args=True)
     def put(self):
         try:
             # Get update data from the request body

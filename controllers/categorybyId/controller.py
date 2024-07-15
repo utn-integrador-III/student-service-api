@@ -5,12 +5,13 @@ from utils.message_codes import *
 from models.category.model import CategoryModel
 from controllers.category.parser import query_parser_save
 import logging
-
+from utils import auth_required
 
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
     # Get a category by id
+    @auth_required(permission='read_category', with_args=True)    
     def get(self, id):
         try:
             result = CategoryModel.getById(id)
@@ -34,6 +35,7 @@ class CategoryByIdController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Update an existing category by id
+    @auth_required(permission='update_category', with_args=True)
     def put(self, id):
         try:
             data = request.get_json()
@@ -63,6 +65,7 @@ class CategoryByIdController(Resource):
             )
 
     # Delete a category by id
+    @auth_required(permission='delete_category', with_args=True)
     def delete(self, id):
         try:
             if CategoryModel.delete(id):
