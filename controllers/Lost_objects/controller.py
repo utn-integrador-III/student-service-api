@@ -9,13 +9,20 @@ from bson import ObjectId
 import pytz
 import re
 from .parser import LostObjectParser
-from utils import auth_required
+from utils.auth_manager import auth_required
 
 class LostObjectsController(Resource):
     route = '/lostObject'
-
-    @auth_required(permission='read_lost_objects', with_args=True)
-    def get(self):
+    
+    @auth_required(permission='read', with_args=True)
+    def get(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             lost_objects = LostObjectModel.get_all()
             if isinstance(lost_objects, dict) and "error" in lost_objects:
@@ -52,8 +59,15 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-    @auth_required(permission='create_lost_objects', with_args=True)
-    def post(self):
+    @auth_required(permission='write', with_args=True)
+    def post(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             data = request.get_json()
             if not data.get("name"):
@@ -136,8 +150,15 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-    @auth_required(permission='update_lost_objects', with_args=True)
-    def put(self):
+    @auth_required(permission='update', with_args=True)
+    def put(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             args = LostObjectParser.parse_put_request()
             object_id = args['_id']  # Usamos el ID del cuerpo del JSON
@@ -172,7 +193,7 @@ class LostObjectsController(Resource):
             update_result = LostObjectModel.update(object_id, update_data)
 
             if update_result.matched_count == 0:
-                return ServerResponse(message='Objeto perdido no encontrado', message_code=NOT_FOUND, status=StatusCode.NOT_FOUND)
+                return ServerResponse(message='Objeto perdido no encontrado', message_code=NOT_FOUND_MSG, status=StatusCode.NOT_FOUND)
 
             return ServerResponse(data=update_data, message='Objeto perdido actualizado con éxito', status=StatusCode.OK)
 

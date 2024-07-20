@@ -4,12 +4,19 @@ from utils.message_codes import *
 from models.lost_objects.model import LostObjectModel
 import logging
 from bson import ObjectId
-from utils import auth_required
+from utils.auth_manager import auth_required
 
 class LostObjectByIdController(Resource):
     routeById = "/lostObject/<string:id>"
-    @auth_required(permission='read_lost_objects', with_args=True)
-    def get(self, id):
+    @auth_required(permission='read', with_args=True)
+    def get(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = LostObjectModel.getById(id)
             if result:
@@ -30,8 +37,15 @@ class LostObjectByIdController(Resource):
         except Exception as ex:
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-    @auth_required(permission='delete_lost_objects', with_args=True)
-    def delete(self, id):
+    @auth_required(permission='delete', with_args=True)
+    def delete(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = LostObjectModel.delete(id)
             if result:

@@ -5,14 +5,21 @@ from utils.message_codes import *
 from models.category.model import CategoryModel
 from controllers.category.parser import query_parser_save
 import logging
-from utils import auth_required
+from utils.auth_manager import auth_required
 
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
     # Get a category by id
-    @auth_required(permission='read_category', with_args=True)    
-    def get(self, id):
+    @auth_required(permission='read', with_args=True)    
+    def get(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = CategoryModel.getById(id)
             if result:
@@ -35,8 +42,15 @@ class CategoryByIdController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Update an existing category by id
-    @auth_required(permission='update_category', with_args=True)
-    def put(self, id):
+    @auth_required(permission='update', with_args=True)
+    def put(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             data = request.get_json()
             updated_count = CategoryModel.update(id, data)
@@ -66,7 +80,14 @@ class CategoryByIdController(Resource):
 
     # Delete a category by id
     @auth_required(permission='delete_category', with_args=True)
-    def delete(self, id):
+    def delete(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             if CategoryModel.delete(id):
                 return ServerResponse(
