@@ -718,7 +718,17 @@ paths:
           description: "Category object that needs to be updated"
           required: true
           schema:
-            $ref: "#/definitions/CategoryGetById"
+            type: object
+            required:
+              - _id
+              - category_name
+            properties:
+              _id:
+                type: string
+                description: The unique identifier of the category to update. Must be a valid MongoDB ObjectId.
+              category_name:
+                type: string
+                description: The new name for the category.
       summary: "Update an Category"
       description: "Update an Category"
       consumes:
