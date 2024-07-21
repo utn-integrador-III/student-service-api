@@ -5,6 +5,7 @@ from utils.message_codes import *
 from models.zone.model import ZoneModel
 from controllers.zone.parser import query_parser_save
 import logging
+from utils.auth_manager import auth_required
 
 
 class ZoneController(Resource):
@@ -13,8 +14,15 @@ class ZoneController(Resource):
     """
     Get all zones
     """
-
-    def get(self):
+    @auth_required(permission='read', with_args=True)
+    def get(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             zones = ZoneModel.get_all()
 
@@ -46,7 +54,15 @@ class ZoneController(Resource):
     """
     Create a new zone 
     """
-    def post(self):
+    @auth_required(permission='write', with_args=True)
+    def post(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             # Get data from the body of the request
             data = request.get_json()
@@ -76,8 +92,15 @@ class ZoneController(Resource):
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-
-    def put(self):
+    @auth_required(permission='update', with_args=True)
+    def put(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             # Get update data from the request body
             update_data = request.get_json()
