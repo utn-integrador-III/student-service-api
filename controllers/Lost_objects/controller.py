@@ -165,12 +165,12 @@ class LostObjectsController(Resource):
                 update_data["user_email"] = args["user_email"]
 
             if not update_data:
-                return ServerResponse(message='No hay campos válidos para actualizar', message_code=NO_FIELDS_TO_UPDATE, status=StatusCode.BAD_REQUEST)
+                return ServerResponse(message='No hay campos válidos para actualizar', message_code=NO_ITEMS_TO_UPDATE, status=StatusCode.BAD_REQUEST)
 
             update_result = LostObjectModel.update(object_id, update_data)
 
             if update_result.matched_count == 0:
-                return ServerResponse(message='Objeto perdido no encontrado', message_code=NOT_FOUND, status=StatusCode.NOT_FOUND)
+                return ServerResponse(message='Objeto perdido no encontrado', message_code=NO_ITEMS_TO_UPDATE, status=StatusCode.NOT_FOUND)
 
             return ServerResponse(data=update_data, message='Objeto perdido actualizado con éxito', status=StatusCode.OK)
 
