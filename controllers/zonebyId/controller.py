@@ -4,6 +4,7 @@ from utils.server_response import *
 from models.zone.model import ZoneModel
 import logging
 from bson.errors import InvalidId
+from utils.auth_manager import auth_required
 
 
 class ZoneByIdController(Resource):
@@ -13,8 +14,15 @@ class ZoneByIdController(Resource):
     """
     Get all sites
     """
-    
-    def get(self, id):
+    @auth_required(permission='read', with_args=True)
+    def get(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = ZoneModel.get_by_id(id)
             if result:
@@ -51,8 +59,15 @@ class ZoneByIdController(Resource):
     Delete a zone by ID
     """
 
-
-    def delete(self, id):
+    @auth_required(permission='delete', with_args=True)
+    def delete(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             # Validate if the id is a valid ObjectId
             if not ObjectId.is_valid(id):

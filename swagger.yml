@@ -247,6 +247,12 @@ paths:
     get:
       tags:
         - "Zones"
+      parameters:
+      - name: Authorization
+        in: header
+        description: An authorization header
+        required: true
+        type: string
       summary: "Get list of all zones"
       description: "Get list of all zones"
       consumes:
@@ -307,6 +313,11 @@ paths:
       tags:
         - "Zones"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "Zone object that needs to be added"
@@ -372,6 +383,11 @@ paths:
       tags:
         - "Zones"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "Zone object that needs to be updated"
@@ -461,6 +477,11 @@ paths:
           required: true
           type: "integer"
           format: "integer"
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       responses:
         "200":
           description: "Get single zone successfully"
@@ -519,6 +540,11 @@ paths:
           description: "ID of zone to delete"
           required: true
           type: "integer"
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       responses:
         "200":
           description: "Zone successfully deleted"
@@ -573,6 +599,12 @@ paths:
     get:
       tags:
         - "LostObjects"
+      parameters:
+      - name: Authorization
+        in: header
+        description: an authorization header
+        required: true
+        type: string
       summary: "Get list of all Reports"
       description: "Get list of all Reports"
       consumes:
@@ -633,6 +665,11 @@ paths:
       tags:
         - "LostObjects"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "LostObject object that needs to be added"
@@ -698,6 +735,11 @@ paths:
       tags:
         - "LostObjects"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "Lost object that needs to be updated"
@@ -886,6 +928,12 @@ paths:
     get:
       tags:
         - "Categories"
+      parameters:
+      - name: Authorization
+        in: header
+        description: an authorization header
+        required: true
+        type: string
       summary: "Get list of all Categories"
       description: "Get list of all Categories"
       consumes:
@@ -929,6 +977,11 @@ paths:
       tags:
         - "Categories"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "Role object that needs to be added"
@@ -988,6 +1041,11 @@ paths:
       tags:
         - "Categories"
       parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
         - in: "body"
           name: "body"
           description: "Category object that needs to be updated"
@@ -1060,6 +1118,11 @@ paths:
           required: true
           type: "integer"
           format: "integer"
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       responses:
         "200":
           description: "Get single Category successfully"
@@ -1113,6 +1176,11 @@ paths:
           required: true
           type: "integer"
           format: "integer"
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       responses:
         "200":
           description: "Category successfully deleted"
