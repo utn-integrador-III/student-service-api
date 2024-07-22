@@ -78,10 +78,9 @@ class CategoryController(Resource):
             return ServerResponse(
                 category.to_dict(),
                 message="Category successfully created",
-                message_code=CATEGORY_SUCCESFULLY_CREATED,
+                message_code=CATEGORY_SUCCESSFULLY_CREATED,
                 status=StatusCode.CREATED,
             )
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
