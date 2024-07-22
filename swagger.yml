@@ -811,7 +811,7 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
-  /lostObject/{lostObjectId}:
+  /lostObject/{LostObjectId}:
     get:
       tags:
         - "LostObjects"
