@@ -14,7 +14,15 @@ class ZoneByIdController(Resource):
     """
     Get all sites
     """
-    def get(self, id):
+    @auth_required(permission='read', with_args=True)
+    def get(self,id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = ZoneModel.get_by_id(id)
             if result:
