@@ -14,15 +14,7 @@ class ZoneController(Resource):
     """
     Get all zones
     """
-    @auth_required(permission='read', with_args=True)
-    def get(self, **kwargs):
-        current_user = kwargs.get('current_user', None)
-        if current_user:
-            # Proceed with access to current_user data
-            print(f"Current user: {current_user}")
-        else:
-            # Handle cases where current_user is not provided
-            print("No user data available")
+    def get(self):
         try:
             zones = ZoneModel.get_all()
 

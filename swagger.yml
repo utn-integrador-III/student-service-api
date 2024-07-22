@@ -247,12 +247,6 @@ paths:
     get:
       tags:
         - "Zones"
-      parameters:
-      - name: Authorization
-        in: header
-        description: An authorization header
-        required: true
-        type: string
       summary: "Get list of all zones"
       description: "Get list of all zones"
       consumes:
@@ -403,11 +397,6 @@ paths:
           required: true
           type: "integer"
           format: "integer"
-        - name: Authorization
-          in: header
-          description: an authorization header
-          required: true
-          type: string
       responses:
         "200":
           description: "Get single zone successfully"
