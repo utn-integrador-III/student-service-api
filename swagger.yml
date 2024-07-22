@@ -9,7 +9,7 @@ info:
   contact:
     email: "ebarahona@utn.ac.cr"
 host: "localhost:5001"
-basePath: "/booking_api"
+basePath: "/api/docs"
 #The tags are the identifiers for the paths that are created, this will assign a path with a unique tag,
 #meaning that, an specific end-point belongs to a tag or identifier
 tags:
@@ -221,7 +221,7 @@ definitions:
       _id:
         type: string
         example: "238H$Fj3KJD"
-      name:
+      category_name:
         type: string
         example: "Celulares"
   CategoryGetById:
@@ -230,15 +230,15 @@ definitions:
       _id:
         type: string
         example: "238H$Fj3KJD"
-      name:
+      category_name:
         type: string
         example: "Celulares"
   CategoryPost:
     type: object
     required:
-      - "name"
+      - "category_name"
     properties:
-      name:
+      category_name:
         type: string
         example: "Celulares"
 #The paths are the ones with all the information of the CRUD methods of the end-points
@@ -273,8 +273,29 @@ paths:
                     example: "Successfully requested"
                   message_code:
                     example: "OK_MSG"
-
         "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "Server Couldn't Process the Request"
+                  message_code:
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
           description: "No zones found"
           schema:
             allOf:
@@ -283,8 +304,7 @@ paths:
                   message:
                     example: "Zones not found"
                   message_code:
-                    example: "NO_DATA"
-
+                    example: "NOT_FOUND"
         "500":
           description: "Internal Server Error"
           schema:
@@ -312,7 +332,7 @@ paths:
         - "application/json"
       responses:
         "201":
-          description: "Zone succesfully created"
+          description: "Zone successfully created"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
@@ -320,9 +340,31 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Country successfully created"
+                    example: "Zone successfully created"
                   message_code:
-                    example: "COUNTRY_SUCCESSFULLY_CREATED"
+                    example: "ZONE_SUCCESSFULLY_CREATED"
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "Server Couldn't Process the Request"
+                  message_code:
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
         "409":
           description: "Zone already exists"
           schema:
@@ -360,22 +402,50 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "An updated zone"
+          description: "A list of zones"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
               - properties:
                   data:
+                    items:
+                      $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "Successfully requested"
+                  message_code:
+                    example: "OK_MSG"
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Zone successfully updated"
+                    example: "Server Couldn't Process the Request"
                   message_code:
-                    example: "ZONE_SUCCESSFULLY_UPDATED"
-        "500":
-          description: "Internal Server Error"
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
           schema:
-            $ref: "#/definitions/InternalErrorResponse"
-
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "No zones found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Zones not found"
+                  message_code:
+                    example: "NOT_FOUND"
         "422":
           description: "Invalid Id"
           schema:
@@ -386,6 +456,10 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
   /zone/{zoneId}:
     get:
       tags:
@@ -417,7 +491,17 @@ paths:
               - properties:
                   data:
                     $ref: "#/definitions/ZoneGet"
-        "400":
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
           description: "Zone not found"
           schema:
             allOf:
@@ -428,9 +512,15 @@ paths:
                   message_code:
                     example: "NO_DATA"
         "422":
-          description: "Invalid Object Id"
+          description: "Invalid Id"
           schema:
-            $ref: "#/definitions/InvalidIdErrorResponse"
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Invalid Id"
+                  message_code:
+                    example: "INVALID_ID"
         "500":
           description: "Internal Server Error"
           schema:
@@ -470,8 +560,18 @@ paths:
               message_code:
                 type: string
                 example: "ZONE_SUCCESSFULLY_DELETED"
-        "400":
-          description: "Country not found"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "Zone not found"
           schema:
             allOf:
               - $ref: "#/definitions/ErrorResponse"
@@ -481,9 +581,15 @@ paths:
                   message_code:
                     example: "ZONE_ITEM_NOT_FOUND"
         "422":
-          description: "Invalid Object Id"
+          description: "Invalid Id"
           schema:
-            $ref: "#/definitions/InvalidIdErrorResponse"
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Invalid Id"
+                  message_code:
+                    example: "INVALID_ID"
         "500":
           description: "Internal Server Error"
           schema:
@@ -507,7 +613,7 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "A list of lost objects"
+          description: "A list of lostOBjects"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
@@ -519,7 +625,38 @@ paths:
                     example: "Successfully requested"
                   message_code:
                     example: "OK_MSG"
-
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "Server Couldn't Process the Request"
+                  message_code:
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "No LostObject found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Zones not found"
+                  message_code:
+                    example: "NOT_FOUND"
         "500":
           description: "Internal Server Error"
           schema:
@@ -547,7 +684,7 @@ paths:
         - "application/json"
       responses:
         "201":
-          description: "Lost Object succesfully created"
+          description: "Zone successfully created"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
@@ -555,17 +692,39 @@ paths:
                   data:
                     $ref: "#/definitions/LostObjectGet"
                   message:
-                    example: "Lost Object successfully created"
+                    example: "LostObject successfully created"
                   message_code:
                     example: "LOST_OBJECT_SUCCESSFULLY_CREATED"
-        "409":
-          description: "Lost Object already exists"
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/LostObjectGet"
+                  message:
+                    example: "Server Couldn't Process the Request"
+                  message_code:
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
           schema:
             allOf:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "Lost Object aready exist"
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "409":
+          description: "Zone already exists"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject already exist"
                   message_code:
                     example: "LOST_OBJECT_ALREADY_EXIST"
         "500":
@@ -606,6 +765,38 @@ paths:
                     example: "LostObject successfully updated"
                   message_code:
                     example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "Server Couldn't Process the Request"
+                  message_code:
+                    example: "BAD_REQUEST"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "No LostObject found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject not found"
+                  message_code:
+                    example: "NOT_FOUND"
         "500":
           description: "Internal Server Error"
           schema:
@@ -620,6 +811,118 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
+  /lostObject/{LostObjectId}:
+    get:
+      tags:
+        - "LostObjects"
+      summary: "Find lostObject by ID"
+      description: "Returns a single LostObject"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "LostObjectId"
+          in: "path"
+          description: "ID of LostObject to return"
+          required: true
+          type: "integer"
+          format: "integer"
+      responses:
+        "200":
+          description: "Get single LostObject successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    $ref: "#/definitions/LostObjectGet"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "Zone not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject not found"
+                  message_code:
+                    example: "NO_DATA"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+    delete:
+      tags:
+        - "LostObjects"
+      summary: "Delete LostObject by ID"
+      description: "Delete a zone by ID"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "LostObjectId"
+          in: "path"
+          description: "ID of LostObject to delete"
+          required: true
+          type: "integer"
+      responses:
+        "200":
+          description: "LostObject successfully deleted"
+          schema:
+            type: object
+            properties:
+              data:
+                type: string
+                example: null
+              message:
+                type: string
+                example: "LostObject successfully deleted"
+              message_code:
+                type: string
+                example: "LOST_OBJECT_SUCCESSFULLY_DELETED"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "LostObject not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject not found"
+                  message_code:
+                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
+        "422":
+          description: "Invalid Object Id"
+          schema:
+            $ref: "#/definitions/InvalidIdErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
 
   /category:
     get:
@@ -639,19 +942,33 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "A list of Categories"
+          description: "Categories Requested successfully"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
               - properties:
                   data:
-                    items:
-                      $ref: "#/definitions/CategoryGet"
+                    $ref: "#/definitions/CategoryGet"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
                   message:
-                    example: "Successfully requested"
+                    example: "User Do not have the Required Permissions"
                   message_code:
-                    example: "OK_MSG"
-
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "Category not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Category not found"
+                  message_code:
+                    example: "CATEGORY_ITEM_NOT_FOUND"
         "500":
           description: "Internal Server Error"
           schema:
@@ -678,18 +995,34 @@ paths:
       produces:
         - "application/json"
       responses:
-        "201":
-          description: "Category Succesfully created"
+        "200":
+          description: "Get single category successfully"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
               - properties:
                   data:
                     $ref: "#/definitions/CategoryGet"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
                   message:
-                    example: "Category successfully created"
+                    example: "User Do not have the Required Permissions"
                   message_code:
-                    example: "CATEGORY_SUCCESSFULLY_CREATED"
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "LostObject not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject not found"
+                  message_code:
+                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
         "409":
           description: "Category already exists"
           schema:
@@ -718,17 +1051,7 @@ paths:
           description: "Category object that needs to be updated"
           required: true
           schema:
-            type: object
-            required:
-              - _id
-              - category_name
-            properties:
-              _id:
-                type: string
-                description: The unique identifier of the category to update. Must be a valid MongoDB ObjectId.
-              category_name:
-                type: string
-                description: The new name for the category.
+            $ref: "#/definitions/CategoryGetById"
       summary: "Update an Category"
       description: "Update an Category"
       consumes:
@@ -737,22 +1060,37 @@ paths:
         - "application/json"
       responses:
         "200":
-          description: "An updated category"
+          description: "Get single category successfully"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
               - properties:
                   data:
                     $ref: "#/definitions/CategoryGet"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
                   message:
-                    example: "Category successfully updated"
+                    example: "User Do not have the Required Permissions"
                   message_code:
-                    example: "CATEGORY_SUCCESSFULLY_UPDATED"
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "Category not found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "LostObject not found"
+                  message_code:
+                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
         "500":
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-
         "422":
           description: "Invalid Id"
           schema:
@@ -787,13 +1125,23 @@ paths:
           type: string
       responses:
         "200":
-          description: "Get single category successfully"
+          description: "Get single Category successfully"
           schema:
             allOf:
               - $ref: "#/definitions/Response"
               - properties:
                   data:
                     $ref: "#/definitions/CategoryGet"
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
         "404":
           description: "Category not found"
           schema:
@@ -803,7 +1151,7 @@ paths:
                   message:
                     example: "Category not found"
                   message_code:
-                    example: "CATEGORY_ITEM_NOT_FOUND"
+                    example: "NO_DATA"
         "422":
           description: "Invalid Object Id"
           schema:
@@ -837,15 +1185,27 @@ paths:
         "200":
           description: "Category successfully deleted"
           schema:
+            type: object
+            properties:
+              data:
+                type: string
+                example: null
+              message:
+                type: string
+                example: "Category successfully deleted"
+              message_code:
+                type: string
+                example: "CATEGORY_SUCCESSFULLY_DELETED"
+        "401":
+          description: "Unauthorized"
+          schema:
             allOf:
-              - $ref: "#/definitions/Response"
+              - $ref: "#/definitions/ErrorResponse"
               - properties:
-                  data:
-                    $ref: "#/definitions/CategoryGet"
                   message:
-                    example: "Category successfully deleted"
+                    example: "User Do not have the Required Permissions"
                   message_code:
-                    example: "CATEGORY_SUCCESSFULLY_DELETED"
+                    example: "UNAUTHORIZED"
         "404":
           description: "Category not found"
           schema:
@@ -855,7 +1215,7 @@ paths:
                   message:
                     example: "Category not found"
                   message_code:
-                    example: "CATEGORY_ITEM_NOT_FOUND"
+                    example: "CATEGORY_NOT_FOUND"
         "422":
           description: "Invalid Object Id"
           schema:
