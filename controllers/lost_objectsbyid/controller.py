@@ -51,7 +51,7 @@ class LostObjectByIdController(Resource):
             if result:
                 return ServerResponse(
                     message="Report successfully deleted",
-                    message_code=LOST_OBJECTS_SUCCESSFULLY_DELETED,
+                    message_code=LOST_OBJECT_SUCCESSFULLY_DELETED,
                     status=StatusCode.OK,
                 )
             else:

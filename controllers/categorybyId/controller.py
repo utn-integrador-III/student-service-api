@@ -59,7 +59,7 @@ class CategoryByIdController(Resource):
                 return ServerResponse(
                     data={},
                     message="Category successfully updated",
-                    message_code=CATEGORY_SUCCESFULLY_UPDATED,
+                    message_code=CATEGORY_SUCCESSFULLY_UPDATED,
                     status=StatusCode.OK,
                 )
             else:
@@ -92,7 +92,7 @@ class CategoryByIdController(Resource):
             if CategoryModel.delete(id):
                 return ServerResponse(
                     message="Category successfully deleted",
-                    message_code=CATEGORY_SUCCESFULLY_DELETED,
+                    message_code=CATEGORY_SUCCESSFULLY_DELETED,
                     status=StatusCode.OK,
                 )
             else:
