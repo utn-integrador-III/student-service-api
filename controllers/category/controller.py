@@ -12,9 +12,9 @@ class CategoryController(Resource):
     route = "/category"
 
     # Get all categories
-    @auth_required(permission='read', with_args=True)    
-    def get(self,**kwargs):
-        current_user = kwargs.get('current_user', None)
+    @auth_required(permission="read", with_args=True)
+    def get(self, **kwargs):
+        current_user = kwargs.get("current_user", None)
         if current_user:
             # Proceed with access to current_user data
             print(f"Current user: {current_user}")
@@ -46,9 +46,9 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Create a new category
-    @auth_required(permission='write', with_args=True)
-    def post(self,**kwargs):
-        current_user = kwargs.get('current_user', None)
+    @auth_required(permission="write", with_args=True)
+    def post(self, **kwargs):
+        current_user = kwargs.get("current_user", None)
         if current_user:
             # Proceed with access to current_user data
             print(f"Current user: {current_user}")
@@ -57,7 +57,7 @@ class CategoryController(Resource):
             print("No user data available")
         try:
             data = request.get_json()
-            category_name = data.get('category_name', '').strip()
+            category_name = data.get("category_name", "").strip()
             if not category_name:
                 return ServerResponse(
                     data={},

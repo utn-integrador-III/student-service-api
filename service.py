@@ -7,6 +7,7 @@ from controllers.zonebyId.controller import ZoneByIdController
 from controllers.category.controller import CategoryController
 from controllers.categorybyId.controller import CategoryByIdController
 
+
 def addServiceLayer(api: Api):
     # Health
     api.add_resource(HealthController, HealthController.route)
