@@ -43,7 +43,7 @@ class CategoryByIdController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Delete a category by id
-    @auth_required(permission="delete_category", with_args=True)
+    @auth_required(permission="delete", with_args=True)
     def delete(self, id, **kwargs):
         current_user = kwargs.get("current_user", None)
         if current_user:
