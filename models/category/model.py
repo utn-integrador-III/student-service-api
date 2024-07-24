@@ -39,7 +39,9 @@ class CategoryModel:
         try:
             result = __dbmanager__.find_one({"category_name": name})
             if result:
-                return cls(_id=result.get("_id"), name=result.get("category_name"))
+                return cls(
+                    _id=result.get("_id"), category_name=result.get("category_name")
+                )
             return None
         except Exception as ex:
             raise Exception(ex)
