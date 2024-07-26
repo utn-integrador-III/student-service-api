@@ -7,13 +7,14 @@ from controllers.category.parser import query_parser_save
 import logging
 from utils.auth_manager import auth_required
 
+
 class CategoryByIdController(Resource):
     routeById = "/category/<string:id>"
 
     # Get a category by id
-    @auth_required(permission='read', with_args=True)    
+    @auth_required(permission="read", with_args=True)
     def get(self, id, **kwargs):
-        current_user = kwargs.get('current_user', None)
+        current_user = kwargs.get("current_user", None)
         if current_user:
             # Proceed with access to current_user data
             print(f"Current user: {current_user}")
@@ -41,47 +42,10 @@ class CategoryByIdController(Resource):
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-    # Update an existing category by id
-    @auth_required(permission='update', with_args=True)
-    def put(self, id, **kwargs):
-        current_user = kwargs.get('current_user', None)
-        if current_user:
-            # Proceed with access to current_user data
-            print(f"Current user: {current_user}")
-        else:
-            # Handle cases where current_user is not provided
-            print("No user data available")
-        try:
-            data = request.get_json()
-            updated_count = CategoryModel.update(id, data)
-
-            if updated_count is None:
-                return ServerResponse(
-                    data={},
-                    message="Category successfully updated",
-                    message_code=CATEGORY_SUCCESSFULLY_UPDATED,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="Category not found or category already exists",
-                    message_code=NO_DATA,
-                    status=StatusCode.NOT_FOUND,
-                )
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(
-                data={},
-                message="Category not found or category already exists.",
-                message_code=NO_DATA,
-                status=StatusCode.INTERNAL_SERVER_ERROR,
-            )
-
     # Delete a category by id
-    @auth_required(permission='delete_category', with_args=True)
+    @auth_required(permission="delete", with_args=True)
     def delete(self, id, **kwargs):
-        current_user = kwargs.get('current_user', None)
+        current_user = kwargs.get("current_user", None)
         if current_user:
             # Proceed with access to current_user data
             print(f"Current user: {current_user}")
