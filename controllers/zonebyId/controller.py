@@ -15,7 +15,7 @@ class ZoneByIdController(Resource):
     Get all sites
     """
     @auth_required(permission='read', with_args=True)
-    def get(self, id, **kwargs):
+    def get(self,id, **kwargs):
         current_user = kwargs.get('current_user', None)
         if current_user:
             # Proceed with access to current_user data

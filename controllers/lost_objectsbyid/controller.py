@@ -8,15 +8,7 @@ from utils.auth_manager import auth_required
 
 class LostObjectByIdController(Resource):
     routeById = "/lostObject/<string:id>"
-    @auth_required(permission='read', with_args=True)
-    def get(self, id, **kwargs):
-        current_user = kwargs.get('current_user', None)
-        if current_user:
-            # Proceed with access to current_user data
-            print(f"Current user: {current_user}")
-        else:
-            # Handle cases where current_user is not provided
-            print("No user data available")
+    def get(self, id):
         try:
             result = LostObjectModel.getById(id)
             if result:

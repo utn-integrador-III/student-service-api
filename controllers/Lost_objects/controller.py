@@ -13,16 +13,7 @@ from utils.auth_manager import auth_required
 
 class LostObjectsController(Resource):
     route = '/lostObject'
-    
-    @auth_required(permission='read', with_args=True)
-    def get(self, **kwargs):
-        current_user = kwargs.get('current_user', None)
-        if current_user:
-            # Proceed with access to current_user data
-            print(f"Current user: {current_user}")
-        else:
-            # Handle cases where current_user is not provided
-            print("No user data available")
+    def get(self):
         try:
             lost_objects = LostObjectModel.get_all()
             if isinstance(lost_objects, dict) and "error" in lost_objects:
