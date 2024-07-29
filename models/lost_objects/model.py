@@ -21,6 +21,7 @@ class LostObjectModel:
         safekeeper=None,
         user_email=None,
         _id=None,
+        category=None,
     ):
         self.name = name
         self.description = description
@@ -36,6 +37,7 @@ class LostObjectModel:
         self.safekeeper = safekeeper if safekeeper else []
         self.user_email = user_email
         self._id = _id
+        self.category = category
 
     def to_dict(self):
         return {
@@ -50,6 +52,7 @@ class LostObjectModel:
             "claimer": self.claimer,
             "safekeeper": self.safekeeper,
             "user_email": self.user_email,
+            "category": self.category,
         }
 
     @classmethod
@@ -81,6 +84,7 @@ class LostObjectModel:
                     claimer=result.get("claimer"),
                     safekeeper=result.get("safekeeper"),
                     user_email=result.get("user_email"),
+                    category=result.get("category"),
                 )
             return None
         except Exception as ex:

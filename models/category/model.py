@@ -79,3 +79,16 @@ class CategoryModel:
                 return False
         except Exception as ex:
             raise Exception(ex)
+        
+    @classmethod
+    def find_by_name(cls, name):
+        try:
+            result = __dbmanager__.find_one({"category_name": name})
+            if result:
+                return cls(
+                    _id=result.get("_id"),
+                    category_name=result.get("category_name"),
+                )
+            return None
+        except Exception as ex:
+            raise Exception(ex)

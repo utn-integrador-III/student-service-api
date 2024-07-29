@@ -1,5 +1,6 @@
 from flask_restful import Resource
 from flask import request
+from models.category.model import CategoryModel
 from utils.server_response import ServerResponse, StatusCode
 from utils.message_codes import *
 from models.lost_objects.model import LostObjectModel
@@ -13,7 +14,15 @@ from utils.auth_manager import auth_required
 
 class LostObjectsController(Resource):
     route = '/lostObject'
-    def get(self):
+    
+    def get(self, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             lost_objects = LostObjectModel.get_all()
             if isinstance(lost_objects, dict) and "error" in lost_objects:
@@ -50,14 +59,12 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-    @auth_required(permission='write', with_args=True)
+
     def post(self, **kwargs):
         current_user = kwargs.get('current_user', None)
         if current_user:
-            # Proceed with access to current_user data
             print(f"Current user: {current_user}")
         else:
-            # Handle cases where current_user is not provided
             print("No user data available")
         try:
             data = request.get_json()
@@ -108,10 +115,26 @@ class LostObjectsController(Resource):
                     )
                 validated_safekeepers.append({"accepted": False, "user_email": email})
 
+            # Handling category
+            category_name = data.get("category")
+            if not category_name:
+                return ServerResponse(
+                    message="Category is required",
+                    message_code=LOST_OBJECTS_CATEGORY_REQUIRED,
+                    status=StatusCode.BAD_REQUEST,
+                )
+
+            category = CategoryModel.find_by_name(category_name)
+            if not category:
+                return ServerResponse(
+                    message="Category not found",
+                    message_code=CATEGORY_NOT_FOUND,
+                    status=StatusCode.BAD_REQUEST,
+                )
+
+            data["category"] = category.to_dict()
             data["status"] = "Pending"
-            data["creation_date"] = datetime.now(
-                pytz.timezone("America/Costa_Rica")
-            ).replace(tzinfo=None)
+            data["creation_date"] = datetime.now(pytz.timezone("America/Costa_Rica")).replace(tzinfo=None)
             data["attachment_path"] = "/lostObjects"
             data["claim_date"] = None
             data["claimer"] = ""
@@ -121,6 +144,7 @@ class LostObjectsController(Resource):
             ordered_data = {
                 "name": data["name"],
                 "description": data["description"],
+                "category": data["category"],
                 "status": data["status"],
                 "creation_date": data["creation_date"],
                 "attachment_path": data["attachment_path"],
@@ -133,7 +157,7 @@ class LostObjectsController(Resource):
             lost_object = LostObjectModel.create(ordered_data)
             return ServerResponse(
                 lost_object.to_dict(),
-                message="Lost_object successfully created",
+                message="Lost object successfully created",
                 message_code=LOST_OBJECTS_SUCCESSFULLY_CREATED,
                 status=StatusCode.CREATED,
             )
@@ -141,21 +165,19 @@ class LostObjectsController(Resource):
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-    @auth_required(permission='update', with_args=True)
+
     def put(self, **kwargs):
         current_user = kwargs.get('current_user', None)
         if current_user:
-            # Proceed with access to current_user data
             print(f"Current user: {current_user}")
         else:
-            # Handle cases where current_user is not provided
             print("No user data available")
         try:
             args = LostObjectParser.parse_put_request()
             object_id = args['_id']  # Usamos el ID del cuerpo del JSON
 
             if not ObjectId.is_valid(object_id):
-                return ServerResponse(message='Formato de ID inválido o ID faltante', message_code=INVALID_ID, status=StatusCode.BAD_REQUEST)
+                return ServerResponse(message='Invalid or missing ID format', message_code=INVALID_ID, status=StatusCode.BAD_REQUEST)
 
             update_data = {}
             if args.get("name"):
@@ -178,15 +200,33 @@ class LostObjectsController(Resource):
             if args.get("user_email"):
                 update_data["user_email"] = args["user_email"]
 
+            # Handling category
+            if args.get("category"):
+                category_name = args["category"]
+                category = CategoryModel.find_by_name(category_name)
+                if not category:
+                    return ServerResponse(
+                        message="Category not found",
+                        message_code=CATEGORY_NOT_FOUND,
+                        status=StatusCode.BAD_REQUEST,
+                    )
+                update_data["category"] = category.to_dict()
+
             if not update_data:
-                return ServerResponse(message='No hay campos válidos para actualizar', message_code=NO_FIELDS_TO_UPDATE, status=StatusCode.BAD_REQUEST)
+                return ServerResponse(message='No valid fields to update', message_code=NO_FIELDS_TO_UPDATE, status=StatusCode.BAD_REQUEST)
 
             update_result = LostObjectModel.update(object_id, update_data)
 
             if update_result.matched_count == 0:
-                return ServerResponse(message='Objeto perdido no encontrado', message_code=NOT_FOUND_MSG, status=StatusCode.NOT_FOUND)
+                return ServerResponse(message='Lost object not found', message_code=NOT_FOUND_MSG, status=StatusCode.NOT_FOUND)
 
-            return ServerResponse(data=update_data, message='Objeto perdido actualizado con éxito', status=StatusCode.OK)
+            # Convert datetime objects to ISO 8601 string format
+            if isinstance(update_data.get("creation_date"), datetime):
+                update_data["creation_date"] = update_data["creation_date"].isoformat()
+            if isinstance(update_data.get("claim_date"), datetime):
+                update_data["claim_date"] = update_data["claim_date"].isoformat()
+
+            return ServerResponse(data=update_data, message='Lost object successfully updated', status=StatusCode.OK)
 
         except Exception as ex:
             logging.exception(ex)
