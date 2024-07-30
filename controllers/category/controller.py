@@ -13,7 +13,6 @@ class CategoryController(Resource):
     route = "/category"
 
     # Get all categories
-    @auth_required(permission="read", with_args=True)
     def get(self, **kwargs):
         current_user = kwargs.get("current_user", None)
         if current_user:
@@ -47,7 +46,6 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Create a new category
-    @auth_required(permission="write", with_args=True)
     def post(self, **kwargs):
         current_user = kwargs.get("current_user", None)
         if current_user:
@@ -87,7 +85,6 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Update an existing category by id
-    @auth_required(permission="update", with_args=True)
     def put(self, **kwargs):
         current_user = kwargs.get("current_user", None)
         if current_user:
