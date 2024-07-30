@@ -256,6 +256,7 @@ class LostObjectsController(Resource):
                 return ServerResponse(
                     data=update_data,
                     message='Lost object successfully updated',
+                    message_code='LOST_OBJECTS_SUCCESSFULLY_UPDATED',
                     status=StatusCode.OK
                 )
             else:
