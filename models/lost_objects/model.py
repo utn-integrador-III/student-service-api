@@ -120,17 +120,6 @@ class LostObjectModel:
             return obj
 
         return convert_object_id(obj)
-
-    @classmethod
-    def getById(cls, id):
-        try:
-            result = __dbmanager__.get_by_id(id)
-            if result:
-                return cls._convert_object(result)
-            return None
-        except Exception as ex:
-            logging.error(ex)
-            raise Exception(ex)
     
     @classmethod
     def delete(cls, id):
