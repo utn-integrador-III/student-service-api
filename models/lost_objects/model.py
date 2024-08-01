@@ -100,13 +100,17 @@ class LostObjectModel:
     def delete(cls, id):
         try:
             result = __dbmanager__.delete_data(str(id))
+
             if result:
                 return True
             else:
+                logging.error("Deletion failed: No matching user or error during deletion.")
                 return False
+
         except Exception as ex:
-            raise Exception(ex)
-        
+            logging.error(f"An error occurred during deletion: {ex}")
+            return False
+
     @classmethod
     def _convert_object(cls, obj):
         def convert_object_id(obj):

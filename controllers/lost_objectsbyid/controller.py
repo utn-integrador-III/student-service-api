@@ -37,6 +37,11 @@ class LostObjectByIdController(Resource):
             print(f"Current user: {current_user}")
         else:
             print("No user data available")
+            return ServerResponse(
+                message='No user data available',
+                message_code='NO_USER_DATA',
+                status=StatusCode.UNAUTHORIZED
+            )
 
         try:
             # Validate the ID format
@@ -57,34 +62,46 @@ class LostObjectByIdController(Resource):
                     status=StatusCode.NOT_FOUND
                 )
 
-            if existing_document.get("user_email") != current_user.get("email"):
+            document_email = existing_document.get("user_email")
+            current_email = current_user.get("email")
+
+            if document_email != current_email:
                 return ServerResponse(
-                    message=f'User email does not match.',
+                    message='User email does not match.',
                     message_code='USER_EMAIL_MISMATCH',
                     status=StatusCode.FORBIDDEN
                 )
 
             if existing_document.get("status") != 'Pending':
                 return ServerResponse(
-                    message=f'Cannot delete object because status is not Pending.',
+                    message='Cannot delete object because status is not Pending.',
                     message_code='STATUS_NOT_PENDING',
                     status=StatusCode.FORBIDDEN
                 )
 
             # Proceed with deletion
             delete_result = LostObjectModel.delete(id)
-            if delete_result.deleted_count == 0:
+
+            if isinstance(delete_result, bool):
+                if delete_result:
+                    return ServerResponse(
+                        message="Lost object successfully deleted",
+                        message_code='LOST_OBJECT_SUCCESSFULLY_DELETED',
+                        status=StatusCode.OK,
+                    )
+                else:
+                    return ServerResponse(
+                        message='Failed to delete the document. No document was removed.',
+                        message_code='INTERNAL_SERVER_ERROR',
+                        status=StatusCode.INTERNAL_SERVER_ERROR
+                    )
+            else:
+                logging.error("Unexpected result type from delete_data.")
                 return ServerResponse(
-                    message='Failed to delete the document. No document was removed.',
+                    message='Unexpected result type from delete operation.',
                     message_code='INTERNAL_SERVER_ERROR',
                     status=StatusCode.INTERNAL_SERVER_ERROR
                 )
-
-            return ServerResponse(
-                message="Lost object successfully deleted",
-                message_code='LOST_OBJECT_SUCCESSFULLY_DELETED',
-                status=StatusCode.OK,
-            )
 
         except Exception as ex:
             logging.exception(ex)
