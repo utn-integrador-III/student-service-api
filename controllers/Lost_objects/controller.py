@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request
+from flask import Request, request
 from models.category.model import CategoryModel
 from utils.server_response import ServerResponse, StatusCode
 from utils.message_codes import *
@@ -11,6 +11,7 @@ import pytz
 import re
 from .parser import LostObjectParser
 from utils.auth_manager import auth_required
+from werkzeug.exceptions import BadRequest
 
 class LostObjectsController(Resource):
     route = '/lostObject'
@@ -30,14 +31,15 @@ class LostObjectsController(Resource):
                     data={},
                     message=lost_objects["error"],
                     status=StatusCode.INTERNAL_SERVER_ERROR,
+                    message_code=INTERNAL_SERVER_ERROR_MSG,
                 )
 
             if not lost_objects:  # If there are no lost objects
                 return ServerResponse(
-                    data={},
-                    message="No lost objects found",
-                    message_codes=NO_DATA,
-                    status=StatusCode.OK,
+                    data=None,
+                    message=LOST_OBJECTS_NOT_FOUND,
+                    message_code=NO_DATA,
+                    status=StatusCode.NOT_FOUND,
                 )
 
             def convert_object_id(obj):
@@ -55,17 +57,19 @@ class LostObjectsController(Resource):
 
             lost_objects = [convert_object_id(obj) for obj in lost_objects]
 
-            return ServerResponse(data=lost_objects, status=StatusCode.OK)
+            return ServerResponse(data=lost_objects, status=StatusCode.OK, message_code=OK_MSG, message=LOST_OBJECTS_FOUND)
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
+        
+    @auth_required(permission='write')
     def post(self, **kwargs):
-        current_user = kwargs.get('current_user', None)
+        current_user = kwargs.get('current_user')
         if current_user:
             print(f"Current user: {current_user}")
         else:
             print("No user data available")
+
         try:
             data = request.get_json()
 
@@ -75,6 +79,8 @@ class LostObjectsController(Resource):
                 "description": (LOST_OBJECTS_DESCRIPTION_REQUIRED, "Description is required"),
                 "user_email": (LOST_OBJECTS_USER_EMAIL_REQUIRED, "User email is required"),
                 "category": (LOST_OBJECTS_CATEGORY_REQUIRED, "Category is required"),
+                #"safekeeper": (LOST_OBJECTS_SAFEKEEPER_REQUIRED, "Safekeeper is required"),
+                #"attachment_path": (INCORRECT_REQUEST_PARAM, "Attachment path is required")
             }
 
             for field, (error_code, error_message) in required_fields.items():
@@ -87,7 +93,7 @@ class LostObjectsController(Resource):
 
             # Validate user email
             user_email = data["user_email"]
-            if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", user_email):
+            if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", user_email):               
                 return ServerResponse(
                     message="Invalid email domain",
                     message_code=INVALID_EMAIL_DOMAIN,
@@ -97,16 +103,12 @@ class LostObjectsController(Resource):
             # Validate and process safekeepers
             safekeepers = data.get("safekeeper", [])
             if not isinstance(safekeepers, list):
-                return ServerResponse(
-                    message="Safekeeper should be a list",
-                    message_code=LOST_OBJECTS_SAFEKEEPER_REQUIRED,
-                    status=StatusCode.BAD_REQUEST,
-                )
+                safekeepers = [safekeepers]  # Convert to list if it's a single item
 
             validated_safekeepers = []
             for sk in safekeepers:
-                email = sk.get("user_email")
-                if not email or not re.match(r"^[\w\.-]+@utn\.ac\.cr$", email):
+                email = sk.get("user_email") if isinstance(sk, dict) else sk
+                if not email or not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", email):
                     return ServerResponse(
                         message=f"Invalid email domain for safekeeper: {email}",
                         message_code=INVALID_EMAIL_DOMAIN,
@@ -135,11 +137,11 @@ class LostObjectsController(Resource):
                 "name": data["name"],
                 "description": data["description"],
                 "category": categories,
-                "status": data.get("status", "Pending"),
+                "status": "Pending",
                 "creation_date": datetime.now(pytz.timezone("America/Costa_Rica")).replace(tzinfo=None),
                 "attachment_path": data.get("attachment_path", "/lostObjects"),
-                "claim_date": datetime.fromisoformat(data["claim_date"]) if data.get("claim_date") else None,
-                "claimer": data.get("claimer", ""),
+                "claim_date": None,
+                "claimer": None,
                 "safekeeper": validated_safekeepers,
                 "user_email": user_email,
             }
@@ -158,6 +160,7 @@ class LostObjectsController(Resource):
             logging.exception(f"Unexpected error in post method: {ex}")
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
+    @auth_required(permission='update')
     def put(self, **kwargs):
         current_user = kwargs.get('current_user', None)
         if current_user:
@@ -173,7 +176,7 @@ class LostObjectsController(Resource):
                 return ServerResponse(
                     message='Invalid or missing ID format',
                     message_code='INVALID_ID',
-                    status=StatusCode.BAD_REQUEST
+                    status=StatusCode.UNPROCESSABLE_ENTITY
                 )
 
             existing_document = LostObjectModel.getById(object_id)
@@ -186,60 +189,41 @@ class LostObjectsController(Resource):
                 )
 
             update_data = {}
-            simple_fields = ['name', 'description', 'status', 'attachment_path', 'user_email', 'claimer']
+            simple_fields = ['name', 'description', 'status', 'attachment_path', 'user_email', 'claim_date', 'claimer']
             for field in simple_fields:
-                if args.get(field):
+                if args.get(field) and args.get(field) != existing_document.get(field):
                     update_data[field] = args[field]
 
             if args.get("claim_date"):
-                update_data["claim_date"] = datetime.fromisoformat(args["claim_date"]) if args["claim_date"] else None
+                claim_date = datetime.fromisoformat(args["claim_date"]) if args["claim_date"] else None
+                if claim_date != existing_document.get("claim_date"):
+                    update_data["claim_date"] = claim_date
 
-            if args.get("safekeeper"):
-                validated_safekeepers = []
-                for sk in args["safekeeper"]:
-                    email = sk.get("user_email")
-                    if not email or not re.match(r"^[\w\.-]+@utn\.ac\.cr$", email):
-                        return ServerResponse(
-                            message=f"Invalid email domain for safekeeper: {email}",
-                            message_code='INVALID_EMAIL_DOMAIN',
-                            status=StatusCode.BAD_REQUEST
-                        )
-                    validated_safekeepers.append({"accepted": False, "user_email": email})
-                update_data["safekeeper"] = validated_safekeepers
+            # Validate and process safekeeper
+            if args.get("safekeeper") and args.get("safekeeper") != existing_document.get("safekeeper"):
+                update_data["safekeeper"] = args["safekeeper"]
 
+            # Validate and process categories
             if args.get("category"):
                 category_names = args["category"]
                 if not isinstance(category_names, list):
-                    return ServerResponse(
-                        message="Category should be a list",
-                        message_code='LOST_OBJECTS_CATEGORY_REQUIRED',
-                        status=StatusCode.BAD_REQUEST
-                    )
+                    category_names = [category_names]  # Convert to list if it's a single string
+
                 categories = []
-                for category in category_names:
-                    if not isinstance(category, str):
+                for category_name in category_names:
+                    category = CategoryModel.find_by_name(category_name)
+                    if not category:
                         return ServerResponse(
-                            message=f"Invalid category format: {category}",
-                            message_code='INVALID_CATEGORY_FORMAT',
-                            status=StatusCode.BAD_REQUEST
-                        )
-                    category_name = category.strip().lower()
-                    category_doc = CategoryModel.find_by_name(category_name)
-                    if not category_doc:
-                        return ServerResponse(
-                            message=f"Category '{category_name}' not found",
+                            message=f"Category not found: {category_name}",
                             message_code='CATEGORY_NOT_FOUND',
-                            status=StatusCode.BAD_REQUEST
+                            status=StatusCode.NOT_FOUND
                         )
-                    categories.append(category_doc.to_dict())
-                update_data["category"] = categories
-            else:
-                update_data["category"] = []
+                    categories.append(category.to_dict())  # Store the complete category object
 
-            existing_category_names = {cat.get('category_name', '').strip().lower() for cat in existing_document.get('category', [])}
-            new_category_names = {cat.get('category_name', '').strip().lower() for cat in update_data.get('category', [])}
+                if categories != existing_document.get("category"):
+                    update_data["category"] = categories
 
-            if existing_category_names != new_category_names:
+            if update_data:
                 update_result = LostObjectModel.update(object_id, update_data)
 
                 if update_result.matched_count == 0:
@@ -261,11 +245,22 @@ class LostObjectsController(Resource):
                 )
             else:
                 return ServerResponse(
-                    message='No changes detected in the category field',
+                    message='No changes detected',
                     message_code='NO_CHANGES',
-                    status=StatusCode.OK
+                    status=StatusCode.BAD_REQUEST
                 )
 
+        except BadRequest as ex:
+            return ServerResponse(
+                message=ex.description,
+                message_code='BAD_REQUEST',
+                status=StatusCode.BAD_REQUEST
+            )
+        
         except Exception as ex:
             logging.exception(f"Unexpected error in put method: {ex}")
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+            return ServerResponse(
+                message='An unexpected error occurred',
+                message_code='INTERNAL_SERVER_ERROR',
+                status=StatusCode.INTERNAL_SERVER_ERROR
+            )

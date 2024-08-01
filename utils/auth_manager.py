@@ -1,7 +1,7 @@
 from functools import wraps
 import requests
 from flask import request
-from utils.server_response import *
+from utils.server_response import ServerResponse, StatusCode
 from utils.message_codes import *
 from decouple import config
 import logging
@@ -10,10 +10,14 @@ def auth_required(action=None, permission='', with_args=False):
     def decorator(f):
         @wraps(f)
         def catcher(*args, **kwargs):
-            try:
-                token = request.headers["Authorization"]
-            except KeyError:
-                return {'message': "Authorization token is required"}, 401
+            token = request.headers.get("Authorization")
+            if not token:
+                return ServerResponse(
+                    data=None,
+                    message="Authorization token is required",
+                    message_code=AUTH_TOKEN_REQUIRED,
+                    status=StatusCode.UNAUTHORIZED
+                )
 
             try:
                 # Send Permission to verify if the user has authorization
@@ -24,18 +28,19 @@ def auth_required(action=None, permission='', with_args=False):
                     headers={'Authorization': token},
                     timeout=20
                 )
-            except Exception as ex:
+                response.raise_for_status()
+            except requests.RequestException as ex:
                 logging.error(f"Error in authentication request: {str(ex)}")
-                return {'message': f"Error in authentication occurred: {str(ex)}"}, 500
+                return ServerResponse(
+                    data=None,
+                    message=f"Error in authentication occurred: {str(ex)}",
+                    message_code=AUTH_REQUEST_ERROR,
+                    status=StatusCode.INTERNAL_SERVER_ERROR
+                )
 
             if response.status_code == 200:
                 try:
-                    if response.content:
-                        response_data = response.json()
-                    else:
-                        logging.error(f"Auth service returned an empty response")
-                        return {'message': "Invalid response from auth service"}, 500
-                    
+                    response_data = response.json()
                     name = response_data["data"]["rolName"]
                     
                     bodyRole = {'name': name}
@@ -44,37 +49,45 @@ def auth_required(action=None, permission='', with_args=False):
                         f"{config('AUTH_API_URL')}:{config('AUTH_API_PORT')}/rol",
                         json=bodyRole,
                     )
+                    role_response.raise_for_status()
 
-                    if role_response.status_code == 200:
-                        if role_response.content:
-                            role_response_data = role_response.json()
-                            print(role_response_data)
-                        else:
-                            logging.error(f"Security service returned an empty response")
-                            return {'message': "Invalid response from security service"}, 500
-                        
-                        role_permissions = role_response_data["data"]["permissions"]
-                        if permission in role_permissions:
-                            if with_args:
-                                kwargs['current_user'] = response_data["data"]
-                            return f(*args, **kwargs)
-                        else:
-                            return {'message': "Permission denied"}, 403
+                    role_response_data = role_response.json()
+                    role_permissions = role_response_data["data"]["permissions"]
+                    if permission in role_permissions:
+                        if with_args:
+                            kwargs['current_user'] = response_data["data"]
+                        return f(*args, **kwargs)
                     else:
-                        logging.error(f"Error verifying role permissions: {role_response.content}")
-                        return {'message': "Error verifying role permissions"}, 500
-                except Exception as ex:
+                        return ServerResponse(
+                            data=None,
+                            message="Permission denied",
+                            message_code=PERMISSION_DENIED,
+                            status=StatusCode.FORBIDDEN
+                        )
+                except (requests.RequestException, ValueError) as ex:
                     logging.error(f"Error processing authentication response: {str(ex)}")
-                    return {'message': f"Error processing authentication response: {str(ex)}"}, 500
+                    return ServerResponse(
+                        data=None,
+                        message=f"Error processing authentication response: {str(ex)}",
+                        message_code=AUTH_PROCESSING_ERROR,
+                        status=StatusCode.INTERNAL_SERVER_ERROR
+                    )
             else:
-                if response.content:
-                    try:
-                        return response.json(), 401
-                    except Exception as ex:
-                        logging.error(f"Error decoding JSON response: {str(ex)}, Response content: {response.content}")
-                        return {'message': "Invalid response format from auth service"}, 500
-                else:
-                    logging.error(f"Auth service returned an empty response")
-                    return {'message': "Invalid response from auth service"}, 500
+                try:
+                    error_response = response.json()
+                except ValueError:
+                    logging.error(f"Error decoding JSON response: Response content: {response.content}")
+                    return ServerResponse(
+                        data=None,
+                        message="Invalid response format from auth service",
+                        message_code=INVALID_RESPONSE_FORMAT,
+                        status=StatusCode.INTERNAL_SERVER_ERROR
+                    )
+                return ServerResponse(
+                    data=error_response,
+                    message="Authentication failed",
+                    message_code=AUTH_FAILED,
+                    status=StatusCode.UNAUTHORIZED
+                )
         return catcher
     return decorator

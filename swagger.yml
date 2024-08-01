@@ -128,19 +128,19 @@ definitions:
         example: "Iphone 12 proMax with yellow case"
       status:
         type: string
-        example: "ONF"
+        example: "Pending"
       creation_date:
         type: string
-        example: "2024-06-08T00:00:00.000Z"
+        example: "2024-07-31T20:42:46.934000"
       attachment_path:
         type: string
-        example: "/lostObject"
+        example: " "
       claimed_date:
         type: string
-        example: "null"
+        example: null
       claimer:
         type: string
-        example: "None"
+        example: null
       SafeKeeper:
         type: array
         items:
@@ -148,6 +148,12 @@ definitions:
       user_email:
         type: string
         example: "diferretomo@utn.ac.cr"
+      category:
+        type: object
+        properties:
+          category_name:
+            type: string
+            example: "Celulares"
   LostObjectGetById:
     type: object
     properties:
@@ -193,28 +199,59 @@ definitions:
       description:
         type: string
         example: "Iphone 12 proMax with yellow case"
-      status:
+      user_email:
         type: string
-        example: "ONF"
-      creation_date:
-        type: string
-        example: "2024-06-08T00:00:00.000Z"
+        example: "emrodriguezso@est.utn.ac.cr"
       attachment_path:
         type: string
-        example: "/lostObject"
-      claimed_date:
-        type: string
-        example: "null"
-      claimer:
-        type: string
-        example: "None"
-      SafeKeeper:
+        example: " "
+      safeKeeper:
         type: array
         items:
           $ref: "#/definitions/keeperResponse"
+      category:
+        type: object
+        properties:
+          category_name:
+            type: string
+            example: "Celulares"
+  LostObjectPut:
+    type: object
+    required:
+      - "_id"
+    properties:
+      name:
+        type: string
+        example: "Phone"
+      description:
+        type: string
+        example: "Iphone 12 proMax with yellow case"
+      status:
+        type: string
+        example: "Pending"
+      claimed_date:
+        type: string
+        example: "2024-08-31T20:42:46.934000"
+      claimer:
+        type: string
+        example: "Emmanuel Rodriguez Solano"
       user_email:
         type: string
-        example: "diferretomo@utn.ac.cr"
+        example: "emrodriguezso@est.utn.ac.cr"
+      attachment_path:
+        type: string
+        example: " "
+      safeKeeper:
+        type: array
+        items:
+          $ref: "#/definitions/keeperResponse"
+      category:
+        type: object
+        properties:
+          category_name:
+            type: string
+            example: "Celulares"
+
   CategoryGet:
     type: object
     properties:
@@ -248,11 +285,11 @@ paths:
       tags:
         - "Zones"
       parameters:
-      - name: Authorization
-        in: header
-        description: an authorization header
-        required: true
-        type: string
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       summary: "Get list of all zones"
       description: "Get list of all zones"
       consumes:
@@ -619,38 +656,20 @@ paths:
                     example: "Successfully requested"
                   message_code:
                     example: "OK_MSG"
-        "400":
+
+        "404":
           description: "Bad Request"
           schema:
             allOf:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   data:
-                    $ref: "#/definitions/ZoneGet"
+                    $ref: "#/definitions/LostObjectGet"
                   message:
-                    example: "Server Couldn't Process the Request"
+                    example: "LOST_OBJECTS_NOT_FOUND"
                   message_code:
-                    example: "BAD_REQUEST"
-        "401":
-          description: "Unauthorized"
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-                    example: "User Do not have the Required Permissions"
-                  message_code:
-                    example: "UNAUTHORIZED"
-        "404":
-          description: "No LostObject found"
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-                    example: "Zones not found"
-                  message_code:
-                    example: "NOT_FOUND"
+                    example: "NO DATA"
+
         "500":
           description: "Internal Server Error"
           schema:
@@ -686,9 +705,10 @@ paths:
                   data:
                     $ref: "#/definitions/LostObjectGet"
                   message:
-                    example: "LostObject successfully created"
+                    example: "Lost object successfully created"
                   message_code:
-                    example: "LOST_OBJECT_SUCCESSFULLY_CREATED"
+                    example: "LOST_OBJECTs_SUCCESSFULLY_CREATED"
+
         "400":
           description: "Bad Request"
           schema:
@@ -698,9 +718,10 @@ paths:
                   data:
                     $ref: "#/definitions/LostObjectGet"
                   message:
-                    example: "Server Couldn't Process the Request"
+                    example: "Data is required or invalid data"
                   message_code:
                     example: "BAD_REQUEST"
+
         "401":
           description: "Unauthorized"
           schema:
@@ -708,19 +729,10 @@ paths:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "User Do not have the Required Permissions"
+                    example: "Authorization token is required"
                   message_code:
                     example: "UNAUTHORIZED"
-        "409":
-          description: "Zone already exists"
-          schema:
-            allOf:
-              - $ref: "#/definitions/ErrorResponse"
-              - properties:
-                  message:
-                    example: "LostObject already exist"
-                  message_code:
-                    example: "LOST_OBJECT_ALREADY_EXIST"
+
         "500":
           description: "Internal Server Error"
           schema:
@@ -739,7 +751,7 @@ paths:
           description: "Lost object that needs to be updated"
           required: true
           schema:
-            $ref: "#/definitions/LostObjectGetById"
+            $ref: "#/definitions/LostObjectPut"
       summary: "Update an Lost Object"
       description: "Update an Lost Object"
       consumes:
@@ -759,6 +771,7 @@ paths:
                     example: "LostObject successfully updated"
                   message_code:
                     example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
+
         "400":
           description: "Bad Request"
           schema:
@@ -768,9 +781,10 @@ paths:
                   data:
                     $ref: "#/definitions/ZoneGet"
                   message:
-                    example: "Server Couldn't Process the Request"
+                    example: "No data or invalid data"
                   message_code:
                     example: "BAD_REQUEST"
+
         "401":
           description: "Unauthorized"
           schema:
@@ -778,9 +792,10 @@ paths:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "User Do not have the Required Permissions"
+                    example: "Authorization token is required"
                   message_code:
                     example: "UNAUTHORIZED"
+
         "404":
           description: "No LostObject found"
           schema:
@@ -788,13 +803,15 @@ paths:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "LostObject not found"
+                    example: "Lost object not found"
                   message_code:
                     example: "NOT_FOUND"
+
         "500":
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
+
         "422":
           description: "Invalid Id"
           schema:
@@ -805,6 +822,7 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
+
   /lostObject/{LostObjectId}:
     get:
       tags:
@@ -881,7 +899,7 @@ paths:
           type: "integer"
       responses:
         "200":
-          description: "LostObject successfully deleted"
+          description: "Lost Object successfully deleted"
           schema:
             type: object
             properties:
@@ -894,6 +912,7 @@ paths:
               message_code:
                 type: string
                 example: "LOST_OBJECT_SUCCESSFULLY_DELETED"
+
         "401":
           description: "Unauthorized"
           schema:
@@ -901,9 +920,21 @@ paths:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "User Do not have the Required Permissions"
+                    example: "Authorization token is required"
                   message_code:
                     example: "UNAUTHORIZED"
+
+        "403":
+          description: "Forbidden"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User email does not match"
+                  message_code:
+                    example: "USER_EMAIL_MISMATCH"
+
         "404":
           description: "LostObject not found"
           schema:
@@ -911,13 +942,15 @@ paths:
               - $ref: "#/definitions/ErrorResponse"
               - properties:
                   message:
-                    example: "LostObject not found"
+                    example: "The report does not exist and cannot be deleted."
                   message_code:
-                    example: "LOST_OBJECT_ITEM_NOT_FOUND"
+                    example: "NO_DATA"
+
         "422":
-          description: "Invalid Object Id"
+          description: "Invalid or missing ID format"
           schema:
             $ref: "#/definitions/InvalidIdErrorResponse"
+
         "500":
           description: "Internal Server Error"
           schema:
@@ -928,11 +961,11 @@ paths:
       tags:
         - "Categories"
       parameters:
-      - name: Authorization
-        in: header
-        description: an authorization header
-        required: true
-        type: string
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
       summary: "Get list of all Categories"
       description: "Get list of all Categories"
       consumes:

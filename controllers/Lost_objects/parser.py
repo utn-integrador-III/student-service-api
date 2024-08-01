@@ -1,7 +1,6 @@
 from flask_restful import reqparse
 from werkzeug.exceptions import BadRequest
 import re
-from typing import Dict, Any
 
 class LostObjectParser:
     @staticmethod
@@ -24,7 +23,7 @@ class LostObjectParser:
 
         # Validate user_email
         if args.get('user_email'):
-            if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr)$", args['user_email']):
+            if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", args['user_email']):
                 raise BadRequest('Invalid email domain for user_email')
 
         # Validate safekeeper
@@ -34,7 +33,7 @@ class LostObjectParser:
             for sk in args['safekeeper']:
                 if not isinstance(sk, dict) or 'user_email' not in sk:
                     raise BadRequest(f'Invalid safekeeper format: {sk}')
-                if not re.match(r"^[\w\.-]+@utn\.ac\.cr$", sk['user_email']):
+                if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", sk['user_email']):
                     raise BadRequest(f'Invalid safekeeper email domain: {sk.get("user_email", "")}')
 
         # Validate category

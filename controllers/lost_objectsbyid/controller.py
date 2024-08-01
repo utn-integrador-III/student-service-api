@@ -29,30 +29,68 @@ class LostObjectByIdController(Resource):
         except Exception as ex:
             logging.error(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+    
     @auth_required(permission='delete', with_args=True)
     def delete(self, id, **kwargs):
         current_user = kwargs.get('current_user', None)
         if current_user:
-            # Proceed with access to current_user data
             print(f"Current user: {current_user}")
         else:
-            # Handle cases where current_user is not provided
             print("No user data available")
+
         try:
-            result = LostObjectModel.delete(id)
-            if result:
+            # Validate the ID format
+            if not ObjectId.is_valid(id):
                 return ServerResponse(
-                    message="Report successfully deleted",
-                    message_code=LOST_OBJECT_SUCCESSFULLY_DELETED,
-                    status=StatusCode.OK,
+                    message='Invalid or missing ID format',
+                    message_code='INVALID_ID',
+                    status=StatusCode.UNPROCESSABLE_ENTITY
                 )
-            else:
+
+            # Fetch the existing document
+            existing_document = LostObjectModel.getById(id)
+            if not existing_document:
                 return ServerResponse(
                     data={},
-                    message="The report do not exist and cannot be deleted.",
-                    message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    message="The report does not exist and cannot be deleted.",
+                    message_code='NO_DATA',
+                    status=StatusCode.NOT_FOUND
                 )
+
+            # Check if user_email matches and status is 'Pending'
+            if existing_document.get("user_email") != current_user.get("email"):
+                return ServerResponse(
+                    message='User email does not match',
+                    message_code='USER_EMAIL_MISMATCH',
+                    status=StatusCode.FORBIDDEN
+                )
+
+            if existing_document.get("status") != 'Pending':
+                return ServerResponse(
+                    message='Cannot delete object because status is not Pending',
+                    message_code='STATUS_NOT_PENDING',
+                    status=StatusCode.FORBIDDEN
+                )
+
+            # Proceed with deletion
+            delete_result = LostObjectModel.delete(id)
+            if delete_result.deleted_count == 0:
+                return ServerResponse(
+                    message='INTERNAL_SERVER_ERROR',
+                    message_code='INTERNAL_SERVER_ERROR',
+                    status=StatusCode.INTERNAL_SERVER_ERROR
+                )
+
+            return ServerResponse(
+                message="Lost object successfully deleted",
+                message_code='LOST_OBJECT_SUCCESSFULLY_DELETED',
+                status=StatusCode.OK,
+            )
+
         except Exception as ex:
             logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+            return ServerResponse(
+                message='An unexpected error occurred',
+                message_code='INTERNAL_SERVER_ERROR',
+                status=StatusCode.INTERNAL_SERVER_ERROR
+            )
