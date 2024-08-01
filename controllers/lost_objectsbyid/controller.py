@@ -57,17 +57,16 @@ class LostObjectByIdController(Resource):
                     status=StatusCode.NOT_FOUND
                 )
 
-            # Check if user_email matches and status is 'Pending'
             if existing_document.get("user_email") != current_user.get("email"):
                 return ServerResponse(
-                    message='User email does not match',
+                    message=f'User email does not match.',
                     message_code='USER_EMAIL_MISMATCH',
                     status=StatusCode.FORBIDDEN
                 )
 
             if existing_document.get("status") != 'Pending':
                 return ServerResponse(
-                    message='Cannot delete object because status is not Pending',
+                    message=f'Cannot delete object because status is not Pending.',
                     message_code='STATUS_NOT_PENDING',
                     status=StatusCode.FORBIDDEN
                 )
@@ -76,7 +75,7 @@ class LostObjectByIdController(Resource):
             delete_result = LostObjectModel.delete(id)
             if delete_result.deleted_count == 0:
                 return ServerResponse(
-                    message='INTERNAL_SERVER_ERROR',
+                    message='Failed to delete the document. No document was removed.',
                     message_code='INTERNAL_SERVER_ERROR',
                     status=StatusCode.INTERNAL_SERVER_ERROR
                 )
