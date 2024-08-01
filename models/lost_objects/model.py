@@ -66,28 +66,6 @@ class LostObjectModel:
         return info_db
 
     @classmethod
-    def get_by_name(cls, name):
-        try:
-            result = __dbmanager__.find_one({"name": name})
-            if result:
-                return cls(
-                    _id=result.get("_id"),
-                    name=result.get("name"),
-                    description=result.get("description"),
-                    status=result.get("status"),
-                    attachment_path=result.get("attachment_path"),
-                    creation_date=result.get("creation_date"),
-                    claim_date=result.get("claim_date"),
-                    claimer=result.get("claimer"),
-                    safekeeper=result.get("safekeeper"),
-                    user_email=result.get("user_email"),
-                )
-            return None
-        except Exception as ex:
-            logging.exception(ex)
-            raise Exception("Failed to get lost object by name: " + str(ex))
-
-    @classmethod
     def create(cls, data):
         try:
             if "creation_date" in data and isinstance(data["creation_date"], datetime):
@@ -114,7 +92,6 @@ class LostObjectModel:
         except Exception as ex:
             logging.error(ex)
             raise Exception(ex)
-
     
     @classmethod
     def delete(cls, id):
@@ -143,7 +120,6 @@ class LostObjectModel:
             return obj
 
         return convert_object_id(obj)
-
 
     @classmethod
     def getById(cls, id):
@@ -155,7 +131,6 @@ class LostObjectModel:
         except Exception as ex:
             logging.error(ex)
             raise Exception(ex)
-
     
     @classmethod
     def delete(cls, id):
@@ -184,7 +159,6 @@ class LostObjectModel:
             return obj
 
         return convert_object_id(obj)
-
 
     @classmethod
     def update(cls, object_id, update_data):
