@@ -220,6 +220,9 @@ definitions:
     required:
       - "_id"
     properties:
+      _id:
+        type: string
+        example: "923UThe&#$83"
       name:
         type: string
         example: "Phone"
