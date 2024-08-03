@@ -1,7 +1,7 @@
 from functools import wraps
 import requests
 from flask import request
-from utils.server_response import ServerResponse, StatusCode
+from utils.server_response import *
 from utils.message_codes import *
 from decouple import config
 import logging
@@ -10,16 +10,13 @@ def auth_required(action=None, permission='', with_args=False):
     def decorator(f):
         @wraps(f)
         def catcher(*args, **kwargs):
-            token = request.headers.get("Authorization")
-            if not token:
-                return ServerResponse(
-                    data=None,
-                    message="Authorization token is required",
-                    message_code=AUTH_TOKEN_REQUIRED,
-                    status=StatusCode.UNAUTHORIZED
-                )
+            try:
+                token = request.headers["Authorization"]
+            except KeyError:
+                return {'message': "Authorization token is required"}, 401
 
             try:
+                # Send Permission to verify if the user has authorization
                 body = {'permission': permission}
                 response = requests.post(
                     f"{config('AUTH_API_URL')}:{config('AUTH_API_PORT')}/auth/verify_auth",
@@ -27,58 +24,57 @@ def auth_required(action=None, permission='', with_args=False):
                     headers={'Authorization': token},
                     timeout=20
                 )
-                response.raise_for_status()
-                response_data = response.json()
+            except Exception as ex:
+                logging.error(f"Error in authentication request: {str(ex)}")
+                return {'message': f"Error in authentication occurred: {str(ex)}"}, 500
 
-                if "data" not in response_data:
-                    return ServerResponse(
-                        data=None,
-                        message="No user data in authentication response",
-                        message_code='USER_DATA_NOT_FOUND',
-                        status=StatusCode.UNAUTHORIZED
-                    )
-
-                user_data = response_data["data"]
-                email = user_data.get("email")
-                name = user_data.get("rolName")
-
-                if permission:
+            if response.status_code == 200:
+                try:
+                    if response.content:
+                        response_data = response.json()
+                    else:
+                        logging.error(f"Auth service returned an empty response")
+                        return {'message': "Invalid response from auth service"}, 500
+                    
+                    name = response_data["data"]["rolName"]
+                    
+                    bodyRole = {'name': name}
+                    # Make request to security API to check role permissions
                     role_response = requests.get(
                         f"{config('AUTH_API_URL')}:{config('AUTH_API_PORT')}/rol",
-                        json={'name': name}
+                        json=bodyRole,
                     )
-                    role_response.raise_for_status()
-                    role_permissions = role_response.json()["data"]["permissions"]
-                    if permission not in role_permissions:
-                        return ServerResponse(
-                            data=None,
-                            message="Permission denied",
-                            message_code=PERMISSION_DENIED,
-                            status=StatusCode.FORBIDDEN
-                        )
 
-                if with_args:
-                    kwargs['current_user'] = {
-                        'email': email,
-                        'rolName': name
-                    }
-
-                return f(*args, **kwargs)
-            except requests.RequestException as ex:
-                logging.error(f"Error in authentication request: {str(ex)}")
-                return ServerResponse(
-                    data=None,
-                    message=f"Error in authentication occurred: {str(ex)}",
-                    message_code=AUTH_REQUEST_ERROR,
-                    status=StatusCode.INTERNAL_SERVER_ERROR
-                )
-            except ValueError as ex:
-                logging.error(f"Error processing authentication response: {str(ex)}")
-                return ServerResponse(
-                    data=None,
-                    message=f"Error processing authentication response: {str(ex)}",
-                    message_code=AUTH_PROCESSING_ERROR,
-                    status=StatusCode.INTERNAL_SERVER_ERROR
-                )
+                    if role_response.status_code == 200:
+                        if role_response.content:
+                            role_response_data = role_response.json()
+                            print(role_response_data)
+                        else:
+                            logging.error(f"Security service returned an empty response")
+                            return {'message': "Invalid response from security service"}, 500
+                        
+                        role_permissions = role_response_data["data"]["permissions"]
+                        if permission in role_permissions:
+                            if with_args:
+                                kwargs['current_user'] = response_data["data"]
+                            return f(*args, **kwargs)
+                        else:
+                            return {'message': "Permission denied"}, 403
+                    else:
+                        logging.error(f"Error verifying role permissions: {role_response.content}")
+                        return {'message': "Error verifying role permissions"}, 500
+                except Exception as ex:
+                    logging.error(f"Error processing authentication response: {str(ex)}")
+                    return {'message': f"Error processing authentication response: {str(ex)}"}, 500
+            else:
+                if response.content:
+                    try:
+                        return response.json(), 401
+                    except Exception as ex:
+                        logging.error(f"Error decoding JSON response: {str(ex)}, Response content: {response.content}")
+                        return {'message': "Invalid response format from auth service"}, 500
+                else:
+                    logging.error(f"Auth service returned an empty response")
+                    return {'message': "Invalid response from auth service"}, 500
         return catcher
     return decorator
