@@ -65,7 +65,7 @@ class CategoryModel:
             if existing_category and str(existing_category["_id"]) != id:
                 return None
             result = __dbmanager__.update_data(id, data)
-            return result
+            return result.modified_count > 0
         except Exception as ex:
             raise Exception(ex)
 

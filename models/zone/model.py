@@ -85,7 +85,7 @@ class ZoneModel:
 
         id = ObjectId(id)
         result = __dbmanager__.update_data(id, update_data)
-        if result:
+        if result or result.modified_count > 0:
             updated_zone = cls.get_by_id(str(id))
             return updated_zone
         else:
