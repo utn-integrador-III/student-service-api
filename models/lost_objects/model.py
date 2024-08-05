@@ -21,6 +21,7 @@ class LostObjectModel:
         safekeeper=None,
         user_email=None,
         _id=None,
+        category=None,
     ):
         self.name = name
         self.description = description
@@ -36,6 +37,7 @@ class LostObjectModel:
         self.safekeeper = safekeeper if safekeeper else []
         self.user_email = user_email
         self._id = _id
+        self.category = category
 
     def to_dict(self):
         return {
@@ -50,6 +52,7 @@ class LostObjectModel:
             "claimer": self.claimer,
             "safekeeper": self.safekeeper,
             "user_email": self.user_email,
+            "category": self.category,
         }
 
     @classmethod
@@ -97,13 +100,17 @@ class LostObjectModel:
     def delete(cls, id):
         try:
             result = __dbmanager__.delete_data(str(id))
+
             if result:
                 return True
             else:
+                logging.error("Deletion failed: No matching user or error during deletion.")
                 return False
+
         except Exception as ex:
-            raise Exception(ex)
-        
+            logging.error(f"An error occurred during deletion: {ex}")
+            return False
+
     @classmethod
     def _convert_object(cls, obj):
         def convert_object_id(obj):
