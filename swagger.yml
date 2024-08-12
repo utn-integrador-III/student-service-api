@@ -26,6 +26,7 @@ schemes:
 #The definitions will display the information that the end-points will return, all along with the
 #corresponding messages of the errors.
 definitions:
+  
   keeperResponse:
     type: object
     properties:
@@ -281,8 +282,21 @@ definitions:
       category_name:
         type: string
         example: "Celulares"
+  SafekeeperGet:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "60d5ecb74f421b29c070d256"
+      name:
+        type: string
+        example: "Juan Pérez"
+      email:
+        type: string
+        example: "juan.perez@example.com"
 #The paths are the ones with all the information of the CRUD methods of the end-points
 paths:
+  
   /zone:
     get:
       tags:
@@ -1259,7 +1273,61 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-
+  /safekeeper:
+    get:
+      tags:
+        - "Safekeeper"
+      summary: "Get List Of All SafeKeepers"
+      description: "Get List Of All SafeKeepers"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: Authorization
+          in: header
+          description: Token de autorización
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Safekeeper Requested successfully"
+          schema:
+            allOf:
+              - $ref: "#/definitions/Response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/definitions/SafekeeperGet"
+                  message:
+                    example: "Successfully requested"
+                  message_code:
+                    example: "OK_MSG"
+        "401":
+          description: "No autorizado"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "User Do not have the Required Permissions"
+                  message_code:
+                    example: "UNAUTHORIZED"
+        "404":
+          description: "No se encontraron safekeepers"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "safekeeper not found"
+                  message_code:
+                    example: "NOT_FOUND"
+        "500":
+          description: "Error interno del servidor"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse" 
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
