@@ -6,7 +6,7 @@ from controllers.zone.controller import ZoneController
 from controllers.zonebyId.controller import ZoneByIdController
 from controllers.category.controller import CategoryController
 from controllers.categorybyId.controller import CategoryByIdController
-
+from controllers.safekeeper.controller import SafekeeperController
 
 def addServiceLayer(api: Api):
     # Health
@@ -22,3 +22,7 @@ def addServiceLayer(api: Api):
     # Lost Objects
     api.add_resource(LostObjectsController, LostObjectsController.route)
     api.add_resource(LostObjectByIdController, LostObjectByIdController.routeById)
+    
+    #SafeKeeper
+    api.add_resource(SafekeeperController, SafekeeperController.route)
+
