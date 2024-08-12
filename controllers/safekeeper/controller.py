@@ -1,11 +1,13 @@
 from flask_restful import Resource
 from utils.server_response import ServerResponse, StatusCode
 from models.safekeeper.model import SafekeeperModel
+from utils.auth_manager import auth_required
 import logging
 
 class SafekeeperController(Resource):
     route = "/safekeeper"
 
+    @auth_required(permission='read', with_args=True)
     def get(self, **kwargs):
         try:
             safekeepers = SafekeeperModel.getAll()
