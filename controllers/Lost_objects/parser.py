@@ -26,15 +26,15 @@ class LostObjectParser:
             if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", args['user_email']):
                 raise BadRequest('Invalid email domain for user_email')
 
-        # Validate safekeeper
+        # Validate safekeepers
         if args.get('safekeeper'):
             if not isinstance(args['safekeeper'], list):
-                raise BadRequest('Safekeeper should be a list')
+                raise BadRequest('Safekeepers should be a list')
             for sk in args['safekeeper']:
-                if not isinstance(sk, dict) or 'user_email' not in sk:
+                if not isinstance(sk, dict) or 'email' not in sk:
                     raise BadRequest(f'Invalid safekeeper format: {sk}')
-                if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", sk['user_email']):
-                    raise BadRequest(f'Invalid safekeeper email domain: {sk.get("user_email", "")}')
+                if not re.match(r"^[\w\.-]+@(utn\.ac\.cr|est\.utn\.ac\.cr|adm\.utn\.ac\.cr)$", sk['email']):
+                    raise BadRequest(f'Invalid safekeeper email domain: {sk.get("email", "")}')
 
         # Validate category
         if args.get('category'):
