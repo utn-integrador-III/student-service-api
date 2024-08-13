@@ -1,8 +1,10 @@
+from bson import ObjectId
 from flask_restful import Resource
 from utils.server_response import *
 from models.zone.model import ZoneModel
 import logging
 from bson.errors import InvalidId
+from utils.auth_manager import auth_required
 
 
 class ZoneByIdController(Resource):
@@ -12,8 +14,15 @@ class ZoneByIdController(Resource):
     """
     Get all sites
     """
-    
-    def get(self, id):
+    @auth_required(permission='read', with_args=True)
+    def get(self,id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             result = ZoneModel.get_by_id(id)
             if result:
@@ -21,25 +30,25 @@ class ZoneByIdController(Resource):
                 result["_id"] = str(result["_id"]) if "_id" in result else None
                 return ServerResponse(
                     data=result,
-                    message="Zone found",
+                    message="Successfully requested",
                     message_code=OK_MSG,
                     status=StatusCode.OK,
                 )
             else:
                 return ServerResponse(
-                    data={},
-                    message="Zone does not exist",
+                    data=None,
+                    message="Zone not found",
                     message_code=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
 
         except InvalidId as ex:
             logging.error(f"Invalid ObjectId: {ex}")
             return ServerResponse(
-                data={},
-                message="Invalid zone ID",
+                data=None,
+                message="Invalid Id",
                 message_code=INVALID_ID,
-                status=StatusCode.BAD_REQUEST,
+                status=StatusCode.UNPROCESSABLE_ENTITY,
             )
 
         except Exception as ex:
@@ -50,8 +59,20 @@ class ZoneByIdController(Resource):
     Delete a zone by ID
     """
 
-    def delete(self, id):
+    @auth_required(permission='delete', with_args=True)
+    def delete(self, id, **kwargs):
+        current_user = kwargs.get('current_user', None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
+            # Validate if the id is a valid ObjectId
+            if not ObjectId.is_valid(id):
+                raise InvalidId(f"Invalid ObjectId: {id}")
+
             result = ZoneModel.delete(id)
             if result:
                 return ServerResponse(
@@ -61,14 +82,27 @@ class ZoneByIdController(Resource):
                 )
             else:
                 return ServerResponse(
-                    data={},
-                    message="The zone no exists and cannot be deleted.",
-                    message_codes=NO_DATA,
+                    data=None,
+                    message="Zone not found",
+                    message_code=ZONE_ITEM_NOT_FOUND,
                     status=StatusCode.OK,
                 )
+        except InvalidId as ex:
+            logging.error(f"Invalid ObjectId: {ex}")
+            return ServerResponse(
+                data=None,
+                message="Invalid Id",
+                message_code=INVALID_ID,
+                status=StatusCode.UNPROCESSABLE_ENTITY,
+            )
         except Exception as ex:
-            logging.error(f"Error getting zone by ID: {ex}")
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
+            logging.exception(f"Error deleting zone by id: {ex}")
+            return ServerResponse(
+                data=None,
+                message="Internal server error",
+                message_code=INTERNAL_SERVER_ERROR_MSG,
+                status=StatusCode.INTERNAL_SERVER_ERROR,
+            )
         
    
     

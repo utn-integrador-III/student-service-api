@@ -1,17 +1,26 @@
+from bson import ObjectId
 from flask_restful import Resource
 from flask import request
 from utils.server_response import *
 from utils.message_codes import *
 from models.category.model import CategoryModel
-from controllers.category.parser import query_parser_save
+from controllers.category.parser import query_parser_put, query_parser_save
 import logging
+from utils.auth_manager import auth_required
 
 
 class CategoryController(Resource):
     route = "/category"
 
     # Get all categories
-    def get(self):
+    def get(self, **kwargs):
+        current_user = kwargs.get("current_user", None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             categories = CategoryModel.getAll()
             if isinstance(categories, dict) and "error" in categories:
@@ -26,7 +35,7 @@ class CategoryController(Resource):
                     data={},
                     message="No categories found",
                     message_codes=NO_DATA,
-                    status=StatusCode.OK,
+                    status=StatusCode.BAD_REQUEST,
                 )
 
             for cat in categories:
@@ -37,13 +46,23 @@ class CategoryController(Resource):
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
     # Create a new category
-    def post(self):
+    @auth_required(permission="write")
+    def post(self, **kwargs):
+        current_user = kwargs.get("current_user", None)
+        if current_user:
+            # Proceed with access to current_user data
+            print(f"Current user: {current_user}")
+        else:
+            # Handle cases where current_user is not provided
+            print("No user data available")
         try:
             data = request.get_json()
-            if not data.get("category_name"):
+            category_name = data.get("category_name", "").strip()
+            if not category_name:
                 return ServerResponse(
-                    message="Category name is required",
-                    message_code=CATEGORY_NAME_REQUIRED,
+                    data={},
+                    message="Category name cannot be empty",
+                    message_code=EMPTY_CATEGORY_NAME,
                     status=StatusCode.BAD_REQUEST,
                 )
 
@@ -59,51 +78,40 @@ class CategoryController(Resource):
             return ServerResponse(
                 category.to_dict(),
                 message="Category successfully created",
-                message_code=CATEGORY_SUCCESFULLY_CREATED,
+                message_code=CATEGORY_SUCCESSFULLY_CREATED,
                 status=StatusCode.CREATED,
             )
         except Exception as ex:
             logging.exception(ex)
             return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
 
-
-class CategoryByIdController(Resource):
-    routeById = "/category/<string:id>"
-
-    # Get a category by id
-    def get(self, id):
-        try:
-            result = CategoryModel.getById(id)
-            if result:
-                result["_id"] = str(result["_id"]) if "_id" in result else None
-                return ServerResponse(
-                    data=result,
-                    message="Category found",
-                    message_code=OK_MSG,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="Category does not exist",
-                    message_code=NO_DATA,
-                    status=StatusCode.OK,
-                )
-        except Exception as ex:
-            logging.error(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)
-
     # Update an existing category by id
-    def put(self, id):
-        try:
-            data = request.get_json()
-            updated_count = CategoryModel.update(id, data)
+    @auth_required(permission="update")
+    def put(self, **kwargs):
+        current_user = kwargs.get("current_user", None)
+        if current_user:
+            print(f"Current user: {current_user}")
+        else:
+            print("No user data available")
 
-            if updated_count is None:
+        try:
+            parser = query_parser_put()
+            args = parser.parse_args()
+            object_id = args["_id"]
+            if not ObjectId.is_valid(object_id):
+                return ServerResponse(
+                    message="Invalid ID format or missing ID",
+                    message_code=INVALID_ID,
+                    status=StatusCode.BAD_REQUEST,
+                )
+            object_id = ObjectId(object_id)
+            data = {"category_name": args["category_name"]}
+            updated_count = CategoryModel.update(object_id, data)
+            if updated_count:
                 return ServerResponse(
                     data={},
                     message="Category successfully updated",
-                    message_code=CATEGORY_SUCCESFULLY_UPDATED,
+                    message_code=CATEGORY_SUCCESSFULLY_UPDATED,
                     status=StatusCode.OK,
                 )
             else:
@@ -121,23 +129,3 @@ class CategoryByIdController(Resource):
                 message_code=NO_DATA,
                 status=StatusCode.INTERNAL_SERVER_ERROR,
             )
-
-    # Delete a category by id
-    def delete(self, id):
-        try:
-            if CategoryModel.delete(id):
-                return ServerResponse(
-                    message="Category successfully deleted",
-                    message_code=CATEGORY_SUCCESFULLY_DELETED,
-                    status=StatusCode.OK,
-                )
-            else:
-                return ServerResponse(
-                    data={},
-                    message="The category does not exist and cannot be deleted.",
-                    message_code=NO_DATA,
-                    status=StatusCode.OK,
-                )
-        except Exception as ex:
-            logging.exception(ex)
-            return ServerResponse(status=StatusCode.INTERNAL_SERVER_ERROR)

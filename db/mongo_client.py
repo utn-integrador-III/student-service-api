@@ -20,7 +20,7 @@ class Connection:
         try:
             result = self.collection.find({})
         except Exception as e:
-            return e
+            raise Exception(e)
         return result
 
     def find_one(self, name):
@@ -29,35 +29,43 @@ class Connection:
             return result
         except Exception as e:
             logging.exception(e)
-            return str(e)
+            raise Exception(e)
 
     def get_by_id(self, id):
         try:
             result = self.collection.find_one({"_id": ObjectId(id)})
         except Exception as e:
-            return e
+            raise Exception(e)
+        return result
+
+    def get_by_query(self, query):
+        try:
+            result = self.collection.find(query)
+        except Exception as e:
+            raise Exception(e)
         return result
 
     def create_data(self, data):
         try:
             return self.collection.insert_one(data)
         except Exception as e:
-            return e
-
-    def update_data(self, filter_id, new_data):
-        try:
-            self.collection.update_one({"_id": ObjectId(filter_id)}, {"$set": new_data})
-        except Exception as e:
-            logging.exception(e)
-            raise e
+            raise Exception(e)
 
     def update_data(self, id, new_data):
         try:
-            result = self.collection.update_one({"_id": ObjectId(id)}, {"$set": new_data})
-            return result.modified_count > 0
+            return self.collection.update_one({"_id": ObjectId(id)}, {"$set": new_data})
         except Exception as e:
             logging.exception(e)
-            return str(e)
+            raise Exception(e)
+    
+    def update_by_condition(self, condition, new_data):
+        try:
+            self.collection.update_one(
+                condition,
+                {"$set": new_data}
+            )
+        except Exception as e:
+            raise Exception(e)
 
     def delete_data(self, id):
         try:

@@ -39,7 +39,9 @@ class CategoryModel:
         try:
             result = __dbmanager__.find_one({"category_name": name})
             if result:
-                return cls(_id=result.get("_id"), name=result.get("category_name"))
+                return cls(
+                    _id=result.get("_id"), category_name=result.get("category_name")
+                )
             return None
         except Exception as ex:
             raise Exception(ex)
@@ -56,12 +58,14 @@ class CategoryModel:
     @classmethod
     def update(cls, id, data):
         try:
-            new_category_name = data.get("category_name")
+            new_category_name = data.get("category_name", "").strip()
             existing_category = cls.getByName(new_category_name)
+            if not new_category_name:
+                return None
             if existing_category and str(existing_category["_id"]) != id:
                 return None
             result = __dbmanager__.update_data(id, data)
-            return result
+            return result.modified_count > 0
         except Exception as ex:
             raise Exception(ex)
 
@@ -73,5 +77,18 @@ class CategoryModel:
                 return True
             else:
                 return False
+        except Exception as ex:
+            raise Exception(ex)
+        
+    @classmethod
+    def find_by_name(cls, name):
+        try:
+            result = __dbmanager__.find_one({"category_name": name})
+            if result:
+                return cls(
+                    _id=result.get("_id"),
+                    category_name=result.get("category_name"),
+                )
+            return None
         except Exception as ex:
             raise Exception(ex)
