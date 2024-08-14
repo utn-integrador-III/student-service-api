@@ -281,6 +281,18 @@ definitions:
       category_name:
         type: string
         example: "Celulares"
+  SafekeeperGet:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: "60d5ecb74f421b29c070d256"
+      name:
+        type: string
+        example: "Juan Pérez"
+      email:
+        type: string
+        example: "juan.perez@example.com"
 #The paths are the ones with all the information of the CRUD methods of the end-points
 paths:
   /zone:
@@ -1390,7 +1402,50 @@ paths:
           description: "Internal Server Error"
           schema:
             $ref: "#/definitions/InternalErrorResponse"
-
+  /safekeeper:
+    get:
+      tags:
+        - "Safekeeper"
+      summary: "Get A List Of All SafeKeepers"
+      description: "Get A List Of All SafeKeepers"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - name: Authorization
+          in: header
+          description: Authorization Token
+          required: true
+          type: string
+      responses:
+        "200":
+          description: "Safekeeper Requested successfully"
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: "#/definitions/SafekeeperGet"
+              message:
+                type: string
+                example: "Safekeeper Requested successfully"
+              message_code:
+                type: string
+                example: "OK_MSG"
+        "401":
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "404":
+          description: "safekeeper not found"
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
