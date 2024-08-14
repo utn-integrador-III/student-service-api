@@ -837,6 +837,160 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
+    patch:
+      tags:
+        - "LostObjects"
+      parameters:
+        - name: Authorization
+          in: header
+          description: an authorization header
+          required: true
+          type: string
+        - in: "body"
+          name: "body"
+          description: "Lost object that needs to be updated"
+          required: true
+          schema:
+            $ref: "#/definitions/LostObjectPut"
+      summary: "Update a Lost Object"
+      description: "Update a Lost Object"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "An updated Lost Object"
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    example: "923UThe&#$83"
+                  name:
+                    type: string
+                    example: "Phone"
+                  description:
+                    type: string
+                    example: "Iphone 12 proMax with yellow case"
+                  status:
+                    type: string
+                    example: "Claimed"
+                  creation_date:
+                    type: string
+                    example: "2024-07-31T20:42:46.934000"
+                  claim_date:
+                    type: string
+                    example: "2024-08-09T11:46:38.354991"
+                  claimer:
+                    type: string
+                    example: "jose@est.utn.ac.cr"
+                  safekeeper:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        accepted:
+                          type: boolean
+                          example: true
+                        user_email:
+                          type: string
+                          example: "semataoe@utn.ac.cr"
+                  user_email:
+                    type: string
+                    example: "diferretomo@utn.ac.cr"
+                  category:
+                    type: object
+                    properties:
+                      category_name:
+                        type: string
+                        example: "Celulares"
+                  attachment_path:
+                    type: string
+                    example: " "
+              message:
+                type: string
+                example: "Lost object successfully updated"
+              message_code:
+                type: string
+                example: "LOST_OBJECT_SUCCESSFULLY_UPDATED"
+
+        "400":
+          description: "Bad Request"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  data:
+                    $ref: "#/definitions/ZoneGet"
+                  message:
+                    example: "No data or invalid data"
+                  message_code:
+                    example: "BAD_REQUEST"
+                    
+        "400_invalid_status":
+          description: "Invalid status"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Invalid status. Must be 'Claimed' or 'Cancelled'"
+                  message_code:
+                    example: "INVALID_STATUS"
+                    
+        "400_email_required":
+          description: "Email required"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Email for claimer is required"
+                  message_code:
+                    example: "EMAIL_REQUIRED"
+
+        "401":
+          description: "Unauthorized"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Authorization token is required"
+                  message_code:
+                    example: "UNAUTHORIZED"
+
+        "404":
+          description: "No LostObject found"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Lost object not found"
+                  message_code:
+                    example: "NOT_FOUND"
+
+        "500":
+          description: "Internal Server Error"
+          schema:
+            $ref: "#/definitions/InternalErrorResponse"
+
+        "422":
+          description: "Invalid Id"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Invalid Id"
+                  message_code:
+                    example: "INVALID_ID"
+
 
   /lostObject/{LostObjectId}:
     get:
