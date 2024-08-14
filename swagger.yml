@@ -930,6 +930,28 @@ paths:
                     example: "No data or invalid data"
                   message_code:
                     example: "BAD_REQUEST"
+                    
+        "400_invalid_status":
+          description: "Invalid status"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Invalid status. Must be 'Claimed' or 'Cancelled'"
+                  message_code:
+                    example: "INVALID_STATUS"
+                    
+        "400_email_required":
+          description: "Email required"
+          schema:
+            allOf:
+              - $ref: "#/definitions/ErrorResponse"
+              - properties:
+                  message:
+                    example: "Email for claimer is required"
+                  message_code:
+                    example: "EMAIL_REQUIRED"
 
         "401":
           description: "Unauthorized"
@@ -968,6 +990,7 @@ paths:
                     example: "Invalid Id"
                   message_code:
                     example: "INVALID_ID"
+
 
   /lostObject/{LostObjectId}:
     get:
