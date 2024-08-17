@@ -81,7 +81,7 @@ class LostObjectsController(Resource):
                     LOST_OBJECTS_SAFEKEEPER_REQUIRED,
                     "Safekeeper is required",
                 ),
-                # "attachment_path": (INCORRECT_REQUEST_PARAM, "Attachment path is required")
+            "attachment_path": (INCORRECT_REQUEST_PARAM, "Attachment path is required")
             }
 
             for field, (error_code, error_message) in required_fields.items():
