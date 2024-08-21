@@ -220,30 +220,22 @@ class LostObjectsController(Resource):
                 "claimer",
             ]
             for field in simple_fields:
-                if args.get(field) and args.get(field) != existing_document.get(field):
+                if args.get(field) is not None and args.get(field) != existing_document.get(field):
                     update_data[field] = args[field]
 
             if args.get("claim_date"):
-                claim_date = (
-                    datetime.fromisoformat(args["claim_date"])
-                    if args["claim_date"]
-                    else None
-                )
+                claim_date = datetime.fromisoformat(args["claim_date"]) if args["claim_date"] else None
                 if claim_date != existing_document.get("claim_date"):
                     update_data["claim_date"] = claim_date
 
-            if args.get("safekeeper"):
+            if args.get("safekeeper") is not None:
                 safekeepers = args.get("safekeeper")
                 if not isinstance(safekeepers, list):
                     safekeepers = [safekeepers]
 
                 validated_safekeepers = []
                 for sk in safekeepers:
-                    if (
-                        not isinstance(sk, dict)
-                        or "email" not in sk
-                        or "accepted" not in sk
-                    ):
+                    if not isinstance(sk, dict) or "email" not in sk:
                         logging.error(f"Invalid safekeeper format: {sk}")
                         return ServerResponse(
                             message="Invalid safekeeper format",
@@ -265,15 +257,14 @@ class LostObjectsController(Resource):
                         {"accepted": sk.get("accepted", False), "email": email}
                     )
 
-                if validated_safekeepers != existing_document.get("safekeeper"):
+                # Compare safekeepers ignoring order
+                if set(tuple(sorted(d.items())) for d in validated_safekeepers) != set(tuple(sorted(d.items())) for d in existing_document.get("safekeeper", [])):
                     update_data["safekeeper"] = validated_safekeepers
 
-            if args.get("category"):
+            if args.get("category") is not None:
                 category_names = args["category"]
                 if not isinstance(category_names, list):
-                    category_names = [
-                        category_names
-                    ]  # Convert to list if it's a single string
+                    category_names = [category_names]  # Convert to list if it's a single string
 
                 categories = []
                 for category_name in category_names:
@@ -292,14 +283,13 @@ class LostObjectsController(Resource):
                             message_code="CATEGORY_NOT_FOUND",
                             status=StatusCode.NOT_FOUND,
                         )
-                    categories.append(
-                        category.to_dict()
-                    )  # Store the complete category object
+                    categories.append(category.to_dict())  # Store the complete category object
 
                 if categories != existing_document.get("category"):
                     update_data["category"] = categories
 
             if update_data:
+                logging.info(f"Updating object {object_id} with data: {update_data}")
                 update_result = LostObjectModel.update(object_id, update_data)
 
                 if update_result.matched_count == 0:
@@ -320,10 +310,11 @@ class LostObjectsController(Resource):
                     status=StatusCode.OK,
                 )
             else:
+                logging.info(f"No changes detected for object {object_id}")
                 return ServerResponse(
                     message="No changes detected",
                     message_code="NO_CHANGES",
-                    status=StatusCode.BAD_REQUEST,
+                    status=StatusCode.OK,  # Changed from BAD_REQUEST to OK
                 )
 
         except BadRequest as ex:
