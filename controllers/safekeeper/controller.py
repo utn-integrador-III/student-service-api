@@ -7,7 +7,6 @@ import logging
 class SafekeeperController(Resource):
     route = "/safekeeper"
 
-    @auth_required(permission='read', with_args=True)
     def get(self, **kwargs):
         try:
             safekeepers = SafekeeperModel.getAll()
