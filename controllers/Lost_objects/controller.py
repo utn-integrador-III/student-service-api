@@ -81,7 +81,7 @@ class LostObjectsController(Resource):
                     LOST_OBJECTS_SAFEKEEPER_REQUIRED,
                     "Safekeeper is required",
                 ),
-            "attachment_path": (INCORRECT_REQUEST_PARAM, "Attachment path is required")
+            #"attachment_path": (INCORRECT_REQUEST_PARAM, "Attachment path is required")
             }
 
             for field, (error_code, error_message) in required_fields.items():
@@ -166,7 +166,7 @@ class LostObjectsController(Resource):
                 "creation_date": datetime.now(
                     pytz.timezone("America/Costa_Rica")
                 ).replace(tzinfo=None),
-                "attachment_path": data.get("attachment_path", "/lostObjects"),
+                "attachment_path": data.get("attachment_path", " "),
                 "claim_date": None,
                 "claimer": None,
                 "safekeeper": validated_safekeepers,
