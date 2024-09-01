@@ -19,7 +19,7 @@ def auth_required(action=None, permission='', with_args=False):
                 # Send Permission to verify if the user has authorization
                 body = {'permission': permission}
                 response = requests.post(
-                    f"{config('AUTH_API_URL')}:{config('AUTH_API_PORT')}/auth/verify_auth",
+                    f"{config('AUTH_API_URL')}/auth/verify_auth",
                     json=body,
                     headers={'Authorization': token},
                     timeout=20
@@ -41,7 +41,7 @@ def auth_required(action=None, permission='', with_args=False):
                     bodyRole = {'name': name}
                     # Make request to security API to check role permissions
                     role_response = requests.get(
-                        f"{config('AUTH_API_URL')}:{config('AUTH_API_PORT')}/rol",
+                        f"{config('AUTH_API_URL')}/rol",
                         json=bodyRole,
                     )
 
